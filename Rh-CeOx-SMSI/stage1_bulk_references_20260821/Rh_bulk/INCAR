@@ -1,0 +1,27 @@
+SYSTEM  = Rh bulk | Dynamic SMSI personal reference
+ISTART  = 0
+ICHARG  = 2
+
+ENCUT   = 400
+PREC    = Accurate
+EDIFF   = 1E-7
+EDIFFG  = -0.02
+
+ISPIN   = 1
+
+IBRION  = 2
+NSW     = 100
+ISIF    = 3
+POTIM   = 0.30
+
+ISMEAR  = 1
+SIGMA   = 0.20
+
+ALGO    = Normal
+NELM    = 160
+LREAL   = .FALSE.
+ADDGRID = .TRUE.
+LASPH   = .TRUE.
+
+LWAVE   = .TRUE.
+LCHARG  = .TRUE.

@@ -1,0 +1,36 @@
+SYSTEM  = Ce2O3 bulk FM | Dynamic SMSI personal reference
+ISTART  = 0
+ICHARG  = 2
+
+ENCUT   = 400
+PREC    = Accurate
+EDIFF   = 1E-7
+EDIFFG  = -0.02
+
+ISPIN   = 2
+MAGMOM  = 2*1.0 3*0.0
+ISYM    = 0
+
+IBRION  = 2
+NSW     = 120
+ISIF    = 3
+POTIM   = 0.25
+
+ISMEAR  = 0
+SIGMA   = 0.05
+
+ALGO    = Normal
+NELM    = 220
+LREAL   = .FALSE.
+ADDGRID = .TRUE.
+LASPH   = .TRUE.
+
+LDAU      = .TRUE.
+LDAUTYPE  = 2
+LDAUL     = 3 -1
+LDAUU     = 5.0 0.0
+LDAUJ     = 0.0 0.0
+LMAXMIX   = 6
+
+LWAVE   = .TRUE.
+LCHARG  = .TRUE.
