@@ -141,8 +141,10 @@ def incar_slab(system, syms, counts, ispin):
     if ispin == 2:
         mm = " ".join(f"{c}*{1.0 if s == 'Ce' else 0.0:.1f}" for s, c in zip(syms, counts))
         s += f"MAGMOM = {mm}\nISYM = 0\n"
-    s += ("ISMEAR = 1\nSIGMA = 0.10\nALGO = Normal\nAMIX = 0.2\nBMIX = 0.0001\nAMIX_MAG = 0.8\n"
-          "BMIX_MAG = 0.0001\nAMIN = 0.01\nLREAL = .FALSE.\nLASPH = .TRUE.\nADDGRID = .TRUE.\n"
+    # Mixing: VASP default Kerker scheme. The linear-mixing recipe (BMIX = 1e-4) inherited from the insulating
+    # CeO2(111) slab causes charge sloshing on the metallic Rh substrate (SCF hit NELM without converging, 2026-09-10).
+    s += ("ISMEAR = 1\nSIGMA = 0.10\nALGO = Normal\nAMIN = 0.01\nMAXMIX = 40\n"
+          "LREAL = .FALSE.\nLASPH = .TRUE.\nADDGRID = .TRUE.\n"
           "LORBIT = 11\nIBRION = 2\nPOTIM = 0.20\nNSW = 200\nISIF = 2\nEDIFFG = -0.02\n"
           "IDIPOL = 3\nLDIPOL = .TRUE.\nKPAR = 4\nNCORE = 3\nLWAVE = .TRUE.\nLCHARG = .TRUE.\n")
     if "Ce" in syms:

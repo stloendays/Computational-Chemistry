@@ -19,7 +19,7 @@ and obtain the interaction / formation energies as a function of the oxygen chem
 | Smearing | ISMEAR=1, SIGMA=0.10 (metal substrate); E0 (sigma->0) is the reported energy | this stage |
 | Spin | ISPIN=2, Ce seeded 1.0 muB, ISYM=0 | this stage |
 | Relaxation | IBRION=2, EDIFFG = -0.02 eV/A, LREAL=.FALSE. throughout (no separate static needed) | this stage |
-| Mixing | AMIX 0.2 / BMIX 1e-4 / AMIX_MAG 0.8 / AMIN 0.01 | proven on Rh3/CeO2 |
+| Mixing | VASP default Kerker mixing, AMIN 0.01, MAXMIX 40 (linear mixing from the CeO2 slab charge-sloshed on metallic Rh; fixed 2026-09-10) | this stage |
 
 ## Systems (inputs/)
 

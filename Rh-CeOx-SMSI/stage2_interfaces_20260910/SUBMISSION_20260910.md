@@ -44,3 +44,13 @@ Accepted so far: 40_O2 (E0 = -9.8820), 00_Rh111_clean (free-atom max F 0.004 eV/
 Deferred to round 2 (after round-1 relaxations): 500 eV single points on representatives; frozen-fragment / deformation split;
 film at its own lattice (strain energy); 5x5 Rh / (2sqrt3 x 2sqrt3)R30 oxide cell (0.4 % mismatch) if layer-vs-cluster gap is small;
 O2 overbinding correction and dmu_O(T,p) mapping in the dG(mu_O) analysis; no-dipole single point as a control.
+
+## 2026-09-10 night: resubmission of all interface and gas-cluster jobs
+
+Root cause: INCAR mixing block (AMIX 0.2 / BMIX 1e-4 / AMIX_MAG 0.8 / BMIX_MAG 1e-4) was carried over from the insulating
+CeO2(111) slab. On the metallic Rh(111) substrate it switches off Kerker damping and the SCF charge-sloshes:
+20a reached NELM=250 without convergence (dE ~ 1e-2 eV oscillating), 30a oscillated by 0.1-0.4 eV, 10a by ~1 eV.
+Forces from such densities are meaningless, so the six running and five queued jobs were deleted (partial output kept in
+`<dir>/failed_linear_mixing_20260910/`) and resubmitted with VASP default Kerker mixing, AMIN = 0.01, MAXMIX = 40, NELM = 200.
+00_Rh111_clean, 40_O2, 41_CeO2_bulk and the 50a-d films (all converged) are unaffected; the SCF was fine there because the
+films/bulk are insulating and the clean Rh slab used ISPIN=1 with the same mixing but converged in 10-40 steps.
