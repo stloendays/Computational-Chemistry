@@ -137,7 +137,7 @@ def ldau_block(syms):
 
 def incar_slab(system, syms, counts, ispin):
     s = (f"SYSTEM = {system}\nISTART = 0\nICHARG = 2\nPREC = Accurate\nENCUT = 400\n"
-         f"EDIFF = 1E-5\nNELM = 250\nNELMIN = 4\nISPIN = {ispin}\n")
+         f"EDIFF = 1E-5\nNELM = 200\nNELMIN = 4\nISPIN = {ispin}\n")
     if ispin == 2:
         mm = " ".join(f"{c}*{1.0 if s == 'Ce' else 0.0:.1f}" for s, c in zip(syms, counts))
         s += f"MAGMOM = {mm}\nISYM = 0\n"
