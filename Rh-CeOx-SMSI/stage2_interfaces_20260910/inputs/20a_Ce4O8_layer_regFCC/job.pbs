@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+#PBS -N s2_20a_Ce4O8_layer_regFCC
+#PBS -P CFP03-CF-126
+#PBS -l select=1:ncpus=36:mpiprocs=36:ompthreads=1:mem=120gb
+#PBS -l walltime=12:00:00
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+for f in INCAR POSCAR KPOINTS POTCAR; do
+  test -s "$f" || { echo "Missing or empty $f" >&2; exit 2; }
+done
+module purge
+module load intel/2021b
+export OMP_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+VASP_BIN=/nfs/home/svu/junbotong/software/vasp/NUS_HPC_VASP/vasp_632_vtst_solpp_beef_std
+test -x "$VASP_BIN" || { echo "VASP executable not found: $VASP_BIN" >&2; exit 2; }
+NP=$(wc -l < "$PBS_NODEFILE")
+echo "job_id=$PBS_JOBID host=$(hostname) ranks=$NP workdir=$PBS_O_WORKDIR start=$(date --iso-8601=seconds)"
+rm -f STOPCAR
+mpirun -np "$NP" "$VASP_BIN" > vasp.out &
+VASP_PID=$!
+(
+  sleep 41400
+  if kill -0 "$VASP_PID" 2>/dev/null; then
+    printf 'LSTOP = .TRUE.\n' > STOPCAR
+    echo "watchdog_requested_stop=$(date --iso-8601=seconds)"
+  fi
+) &
+WATCHDOG_PID=$!
+set +e
+wait "$VASP_PID"
+RC=$?
+set -e
+kill "$WATCHDOG_PID" 2>/dev/null || true
+wait "$WATCHDOG_PID" 2>/dev/null || true
+rm -f STOPCAR
+echo "end=$(date --iso-8601=seconds) rc=$RC"
+exit "$RC"
