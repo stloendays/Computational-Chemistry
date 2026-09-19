@@ -2,7 +2,7 @@
 #PBS -N s2_41_CeO2_bulk
 #PBS -P CFP03-CF-126
 #PBS -l select=1:ncpus=36:mpiprocs=36:ompthreads=1:mem=32gb
-#PBS -l walltime=02:00:00
+#PBS -l walltime=48:00:00
 #PBS -j oe
 
 set -euo pipefail
@@ -22,7 +22,7 @@ rm -f STOPCAR
 mpirun -np "$NP" "$VASP_BIN" > vasp.out &
 VASP_PID=$!
 (
-  sleep 5400
+  sleep 163800
   if kill -0 "$VASP_PID" 2>/dev/null; then
     printf 'LSTOP = .TRUE.\n' > STOPCAR
     echo "watchdog_requested_stop=$(date --iso-8601=seconds)"
