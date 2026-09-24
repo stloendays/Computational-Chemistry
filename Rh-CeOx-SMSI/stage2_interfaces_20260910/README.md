@@ -1,5 +1,14 @@
 # Dynamic SMSI — Stage 2: CeOx/Rh(111) interface thermodynamics (round 1)
 
+
+> **Binding supervisor update — 2026-09-24**
+>
+> 1. **Amorphous CeOx/SMSI is represented by a Ce2O3 cluster on Rh.** Do not use a periodic Ce2O3 layer as the amorphous model.
+> 2. **Crystalline Ce2O3/SMSI is represented by a Ce2O3 layer on Rh.**
+> 3. **All calculations must be spin-polarized from now on: `ISPIN = 2`.** This applies to new jobs, restarts, refinements, reference calculations and any system entering a new energy comparison. Legacy `ISPIN = 1` results may be kept only as historical records and must not be mixed directly into the new comparison set.
+> 4. **Follow the supervisor's `discussion progress` requirements strictly.** The discussion document is the source of truth for model selection, calculation sequence, comparisons and next steps. Do not independently expand the main workflow beyond it unless the supervisor explicitly requests an extension.
+> 5. **Execution rule for agents:** when asked to update this project, carry the task through to the actual repository change and verification; do not stop at planning, analysis, or an intermediate tool call. Report the resulting file/commit after the write succeeds.
+
 Created 2026-09-10 after the 9-10 group meeting (supervisor accepted the plan and the two reproduction cases).
 Purpose: supervisor's Q1/Q2 — on the same Rh substrate, compare Ce2O3-type layer vs Ce2O3 cluster vs CeO2-type layer,
 and obtain the interaction / formation energies as a function of the oxygen chemical potential.
