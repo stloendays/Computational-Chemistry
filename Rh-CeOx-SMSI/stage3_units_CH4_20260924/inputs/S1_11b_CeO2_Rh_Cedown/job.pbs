@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+#PBS -N s3_S1_11b_CeO2_
+#PBS -P CFP03-CF-126
+#PBS -l select=1:ncpus=36:mpiprocs=36:ompthreads=1:mem=200gb
+#PBS -l walltime=72:00:00
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+for f in INCAR_stageA_spinSP INCAR_stageB_relax POSCAR KPOINTS POTCAR; do
+  test -s "$f" || { echo "Missing or empty $f" >&2; exit 2; }
+done
+module purge
+module load intel/2021b
+export OMP_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+VASP_BIN=/nfs/home/svu/junbotong/software/vasp/NUS_HPC_VASP/vasp_632_vtst_solpp_beef_std
+test -x "$VASP_BIN" || { echo "VASP executable not found: $VASP_BIN" >&2; exit 2; }
+NP=$(wc -l < "$PBS_NODEFILE")
+echo "job_id=$PBS_JOBID host=$(hostname) ranks=$NP workdir=$PBS_O_WORKDIR start=$(date --iso-8601=seconds)"
+START=$(date +%s)
+# watchdog at 250200 s (69.5 h): LSTOP for relaxations, LABORT for single points
+run_stage () {
+  local tag=$1 stop=$2 check=$3
+  cp "INCAR_$tag" INCAR
+  rm -f STOPCAR
+  echo "stage=$tag start=$(date --iso-8601=seconds)"
+  mpirun -np "$NP" "$VASP_BIN" > "vasp_$tag.out" &
+  local VP=$!
+  ( while kill -0 "$VP" 2>/dev/null; do
+      if [ $(( $(date +%s) - START )) -ge 250200 ]; then printf '%s = .TRUE.\n' "$stop" > STOPCAR; echo "watchdog_stop stage=$tag"; break; fi
+      sleep 60; done ) &
+  local WD=$!
+  set +e; wait "$VP"; local RC=$?; set -e
+  kill "$WD" 2>/dev/null || true; wait "$WD" 2>/dev/null || true
+  rm -f STOPCAR
+  cp OSZICAR "OSZICAR_$tag"; cp OUTCAR "OUTCAR_$tag"
+  echo "stage=$tag end=$(date --iso-8601=seconds) rc=$RC"
+  [ "$RC" -eq 0 ] || exit "$RC"
+  case "$check" in
+    scf)   grep -q "aborting loop because EDIFF is reached" OUTCAR || { echo "stage=$tag SCF NOT converged"; exit 3; } ;;
+    relax) grep -q "reached required accuracy" OUTCAR || { echo "stage=$tag RELAX NOT converged"; exit 4; } ;;
+  esac
+}
+run_stage stageA_spinSP LABORT scf
+run_stage stageB_relax LSTOP relax
+echo "end=$(date --iso-8601=seconds) rc=0"

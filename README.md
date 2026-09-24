@@ -6,6 +6,7 @@ Large binaries (POTCAR, WAVECAR, CHGCAR, OUTCAR) are never committed; the licens
 - `Rh-CeOx-SMSI/` — personal project: atmosphere-dependent dynamic SMSI of Rh/CeO2 (CeOx overlayers on Rh(111)).
   - `stage1_bulk_references_20260821/` — Rh, Ce2O3 bulk references.
   - `stage2_interfaces_20260910/` — CeOx/Rh(111) interface thermodynamics, round 1 (contract, inputs, submission log).
+  - `stage3_units_CH4_20260924/` — one CeO2 unit / one Ce2O3 cluster on Rh(111) 4x4 (step 1, interaction energies), then CH4 -> CH3 -> CH2 (step 2); ENCUT 450, ISPIN 2, z = 0.
 
 
 ## Rh-CeOx-SMSI binding scientific rules
