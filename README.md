@@ -8,6 +8,20 @@ Large binaries (POTCAR, WAVECAR, CHGCAR, OUTCAR) are never committed; the licens
   - `stage2_interfaces_20260910/` — CeOx/Rh(111) interface thermodynamics, round 1 (contract, inputs, submission log).
 
 
+## Rh-CeOx-SMSI binding scientific rules
+
+For the Rh-CeOx-SMSI project, the supervisor's `discussion progress` document is the source of truth. Unless the supervisor explicitly revises the interpretation below:
+
+- **The SMSI overlayer composition is treated as Ce2O3-like reduced ceria in the mainline workflow.** It is not treated as an unresolved CeO2-vs-Ce2O3 composition question.
+- **Amorphous SMSI -> Ce2O3 cluster/Rh.** A finite Ce2O3 cluster on Rh represents the amorphous overlayer.
+- **Crystalline SMSI -> Ce2O3 layer/Rh.** A Ce2O3 layer/bilayer on Rh represents the crystalline overlayer.
+- **CeO2 remains the support/reference/control.** Existing CeO2-type calculations may be retained as controls or historical data, but must not redefine the main research question unless the supervisor explicitly reopens that comparison.
+- **Main scientific comparison:** Ce2O3 cluster/Rh vs Ce2O3 crystalline layer/Rh, followed by the reaction and electronic-structure analyses required by the discussion.
+- **All calculations use spin polarization:** new jobs, restarts, refinements, references, adsorption calculations and reaction calculations use `ISPIN = 2`. Legacy `ISPIN = 1` results must not be mixed directly into a new energy comparison without rerunning or validating them under the spin-polarized contract.
+- Ce-containing systems retain **DFT+U with Ueff(Ce 4f) = 5 eV** unless the supervisor explicitly changes it.
+- Do not independently expand the main workflow beyond the discussion-defined questions. Extra phase diagrams, vacancy families, registry searches or other auxiliary calculations are secondary unless required to answer a discussion-defined question or explicitly requested.
+
+
 ## Project-wide slab geometry rule
 
 For every slab / surface model in this repository, use the following mandatory z-coordinate convention:
