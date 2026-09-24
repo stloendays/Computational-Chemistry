@@ -38,6 +38,13 @@ ISPIN = 2 everywhere, slab bottom plane at z = 0 with the whole vacuum above, EN
 | S1_11b_CeO2_Rh_Cedown | Rh64 Ce1 O2 | CeO2 unit, second start | Ce on an fcc hollow in contact with Rh, O bent up |
 | S1_21_CeO2_gas | Ce1 O2 | gas-phase reference | bent O-Ce-O, 15 A box |
 | S1_22_Ce2O3_gas | Ce2 O3 | gas-phase reference | round-1 relaxed 42 |
+| S1_02_Rh111_3x3 | Rh36 | substrate reference of the layer | ideal slab, Gamma 4x4x1 |
+| S1_31_Ce4O6_layer_Rh3x3 | Rh36 Ce4 O6 | Ce2O3 layer (crystalline model), mainline comparison | round-1 30a relaxed, z re-zeroed, flags kept |
+| S1_23_Ce2O3_bulk_AFM | Ce2 O3 | per-unit reference (bulk A-type, AFM) | stage-1 relaxed lattice, ISIF 3, k 7x7x5 |
+
+The last three were added on 2026-09-24 ("全部都按新设置"): the mainline cluster-vs-layer comparison needs the
+layer under the same contract. Cluster vs layer per Ce2O3 unit: E_int/n with the gas unit, and
+E_f/n = [E(X/Rh) − E(Rh) − n·E(Ce2O3, bulk)]/n.
 
 ## Energy definition
 
@@ -54,4 +61,8 @@ of CH4* -> CH3* + H* and CH3* -> CH2* + H* first; barriers only if the superviso
 
 ## Status
 
-2026-09-24: step-1 inputs built (`build_stage3.py`, `inputs/MANIFEST.sha256`); not submitted.
+2026-09-24 22:02 / 22:34: step-1 inputs built (`build_stage3.py`, `inputs/MANIFEST.sha256`) and submitted,
+PBS 1393602–1393609 and 1393717–1393719 on CFP03-CF-126; working directory
+`/scratch/junbotong/Dynamic_SMSI_stage3_units_CH4_20260924` (log `SUBMISSION_stage3.md`).
+Accepted so far: Rh a0(450 eV) = 3.8238 A; CeO2 gas E0 = −19.08022 eV (Ce4+); Ce2O3 gas E0 = −34.23422 eV (2 Ce3+).
+Monitoring: `MONITOR_HANDOFF.md` — Task Scheduler `vanda-stage3-monitor-5h` every 5 h, Claude Code CLI takeover.

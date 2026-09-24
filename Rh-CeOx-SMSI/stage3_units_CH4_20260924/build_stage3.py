@@ -45,14 +45,43 @@ def surf(u, v, z):
     return u * E1 + v * E2 + np.array([0.0, 0.0, z])
 
 
-def rh_slab():
+def rh_slab(n=N):
     atoms = []
     for L in range(NLAY):
         s = L / 3.0                           # ABC stacking
-        for i in range(N):
-            for j in range(N):
+        for i in range(n):
+            for j in range(n):
                 atoms.append(("Rh", surf(i + s, j + s, L * D_RH), L < NFIX))
     return atoms
+
+
+def cell_n(n):
+    return np.array([n * E1, n * E2, [0.0, 0.0, C]])
+
+
+def rezero(path):
+    """Whole relaxed structure (slab + overlayer) from a round-1 CONTCAR, translated so that the bottom
+    Rh plane is at z = 0; the selective-dynamics flags are kept (bottom two layers fixed)."""
+    L = open(path).read().split("\n")
+    s = float(L[1].split()[0])
+    cell = np.array([[float(x) for x in L[2 + i].split()[:3]] for i in range(3)]) * s
+    names, counts = L[5].split(), [int(x) for x in L[6].split()]
+    sd = L[7].strip()[:1] in ("S", "s")
+    i = 8 if sd else 7
+    direct = L[i].strip()[:1] in ("D", "d")
+    i += 1
+    sym = [nm for nm, c in zip(names, counts) for _ in range(c)]
+    atoms = []
+    for k in range(sum(counts)):
+        t = L[i + k].split()
+        p = np.array([float(x) for x in t[:3]])
+        p = p @ cell if direct else p
+        fixed = sd and t[3] == "F"
+        atoms.append([sym[k], p, fixed])
+    zmin = min(a[1][2] for a in atoms if a[0] == "Rh")
+    for a in atoms:
+        a[1] = a[1] - np.array([0.0, 0.0, zmin])
+    return [tuple(a) for a in atoms], cell
 
 
 def read_poscar(path):
@@ -162,8 +191,8 @@ def ldau(syms):
             "LDAUJ = " + " ".join("0.0" for _ in syms) + "\nLMAXMIX = 6\n")
 
 
-def incar(system, syms, counts, stage, kind):
-    mag = " ".join("%d*%.1f" % (c, 1.0 if s == "Ce" else 0.0) for s, c in zip(syms, counts))
+def incar(system, syms, counts, stage, kind, magmom=None):
+    mag = magmom or " ".join("%d*%.1f" % (c, 1.0 if s == "Ce" else 0.0) for s, c in zip(syms, counts))
     t = [f"SYSTEM = {system} | {stage}", "PREC = Accurate", "ENCUT = 450", "ISPIN = 2",
          f"MAGMOM = {mag}", "ISYM = 0", "LREAL = .FALSE.", "LASPH = .TRUE.", "ADDGRID = .TRUE.",
          "LORBIT = 11", "NELMIN = 4", "AMIN = 0.01", "MAXMIX = 40", "AMIX_MAG = 0.4", "BMIX_MAG = 1.0"]
@@ -171,6 +200,8 @@ def incar(system, syms, counts, stage, kind):
         t += ["ISMEAR = 1", "SIGMA = 0.10", "IDIPOL = 3", "LDIPOL = .FALSE.", "KPAR = 4", "NCORE = 3"]
     elif kind == "gas":
         t += ["ISMEAR = 0", "SIGMA = 0.05", "NCORE = 3"]
+    elif kind == "bulk_ins":                      # insulating oxide bulk (stage-1 Ce2O3 contract)
+        t += ["ISMEAR = 0", "SIGMA = 0.05", "KPAR = 4", "NCORE = 2"]
     else:                                         # bulk metal
         t += ["ISMEAR = 1", "SIGMA = 0.10", "KPAR = 4", "NCORE = 2"]
     if stage == "stageA_spinSP":                  # spin-polarised single point from scratch
@@ -187,7 +218,8 @@ def incar(system, syms, counts, stage, kind):
         t += ["ISTART = 0", "ICHARG = 2", "ALGO = Normal", "NELM = 200", "EDIFF = 1E-5",
               "IBRION = 3", "IOPT = 7", "POTIM = 0", "MAXMOVE = 0.2", "NSW = 400", "ISIF = 2",
               "EDIFFG = -0.02", "LWAVE = .TRUE.", "LCHARG = .TRUE."]
-    elif stage == "bulk_isif3":                   # Rh lattice constant at 450 eV
+    elif stage == "bulk_isif3":                   # lattice constant at 450 eV
+        # verified 2026-09-24 on S1_00: with ISIF 3 the negative EDIFFG run also brought the stress to 0.00 kB
         t += ["ISTART = 0", "ICHARG = 2", "ALGO = Normal", "NELM = 200", "EDIFF = 1E-7",
               "IBRION = 2", "POTIM = 0.20", "NSW = 60", "ISIF = 3", "EDIFFG = -0.001",
               "LWAVE = .FALSE.", "LCHARG = .FALSE."]
@@ -247,6 +279,7 @@ STAGES = {  # tag, STOPCAR key, check
     "ce": [("stageA_spinSP", "LABORT", "scf"), ("stageB_relax", "LSTOP", "relax")],
     "rh": [("relax", "LSTOP", "relax")],
     "bulk": [("bulk_isif3", "LSTOP", "relax")],
+    "bulkce": [("bulk_isif3", "LSTOP", "relax")],
 }
 
 
@@ -288,14 +321,15 @@ def main():
     os.makedirs(root, exist_ok=True)
     rep = []
 
-    def emit(name, title, atoms, family, kind, cell=CELL, mesh=(3, 3, 1), np_=36, mem="200gb", seldyn=True):
+    def emit(name, title, atoms, family, kind, cell=CELL, mesh=(3, 3, 1), np_=36, mem="200gb", seldyn=True,
+             magmom=None):
         d = os.path.join(root, name)
         os.makedirs(d, exist_ok=True)
         syms = write_poscar(os.path.join(d, "POSCAR"), title, atoms, cell, seldyn)
         counts = [sum(1 for a in atoms if a[0] == s) for s in syms]
         stages = STAGES[family]
         for tag, _, _ in stages:
-            write(os.path.join(d, "INCAR_" + tag), incar(title, syms, counts, tag, kind))
+            write(os.path.join(d, "INCAR_" + tag), incar(title, syms, counts, tag, kind, magmom))
         write(os.path.join(d, "KPOINTS"), kpoints(mesh, title))
         write(os.path.join(d, "POTCAR.spec"), "\n".join(syms) + "\n")
         calls = "\n".join('run_stage %s %s %s' % s for s in stages)
@@ -331,6 +365,21 @@ def main():
     g22, box = gas_from_contcar(os.path.join(R1, "CONTCAR_42_Ce2O3_gas"))
     emit("S1_22_Ce2O3_gas", "Ce2O3 unit in a 15 A box, start = round-1 relaxed 42", g22, "ce", "gas",
          cell=box, mesh=(1, 1, 1), mem="64gb", seldyn=False)
+
+    # added 2026-09-24 (user: "全部都按新设置"): the crystalline Ce2O3 layer for the mainline cluster-vs-layer
+    # comparison, its own 3x3 substrate reference, and bulk A-type Ce2O3 as the per-unit reference
+    emit("S1_02_Rh111_3x3", "Rh(111) p(3x3) 4L clean, bottom 2 fixed (reference for the Ce2O3 layer)",
+         rh_slab(3), "rh", "slab", cell=cell_n(3), mesh=(4, 4, 1))
+    lay, c3 = rezero(os.path.join(R1, "CONTCAR_30a_Ce4O6_layer_2Obot"))
+    emit("S1_31_Ce4O6_layer_Rh3x3", "Ce2O3-type layer Ce4O6 on Rh(111) 3x3, start = round-1 30a relaxed, z re-zeroed",
+         lay, "ce", "slab", cell=c3, mesh=(4, 4, 1))
+    a, c = 3.901, 6.053                           # stage-1 relaxed A-type Ce2O3 (400 eV)
+    hexc = np.array([[a, 0, 0], [-a / 2, a * math.sqrt(3) / 2, 0], [0, 0, c]])
+    frac = [("Ce", (1 / 3, 2 / 3, 0.2451)), ("Ce", (2 / 3, 1 / 3, 0.7549)), ("O", (0, 0, 0)),
+            ("O", (1 / 3, 2 / 3, 0.6474)), ("O", (2 / 3, 1 / 3, 0.3526))]
+    emit("S1_23_Ce2O3_bulk_AFM", "A-type Ce2O3 bulk, AFM (stage-1 ground state), ISIF 3 at ENCUT 450",
+         [(s, np.array(f) @ hexc, False) for s, f in frac], "bulkce", "bulk_ins", cell=hexc,
+         mesh=(7, 7, 5), np_=16, mem="32gb", seldyn=False, magmom="1.0 -1.0 3*0.0")
 
     print("a_s = %.4f A, 4x4 cell a = %.4f A, d(111) = %.4f A, top layer z = %.3f A"
           % (A_S, N * A_S, D_RH, ZTOP))
