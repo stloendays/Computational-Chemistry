@@ -9,9 +9,21 @@
 > 4. **Follow the supervisor's `discussion progress` requirements strictly.** The discussion document is the source of truth for model selection, calculation sequence, comparisons and next steps. Do not independently expand the main workflow beyond it unless the supervisor explicitly requests an extension.
 > 5. **Execution rule for agents:** when asked to update this project, carry the task through to the actual repository change and verification; do not stop at planning, analysis, or an intermediate tool call. Report the resulting file/commit after the write succeeds.
 
+
+
+## Current scientific framing — CeOx composition
+
+The mainline interpretation is fixed as follows unless the supervisor explicitly changes it:
+
+- The SMSI overlayer on Rh is treated as **Ce2O3-like reduced ceria**, rather than an unresolved choice between CeO2 and Ce2O3.
+- **Low-temperature / amorphous state:** model as **Ce2O3 cluster/Rh(111)**.
+- **High-temperature / crystalline state:** model as **Ce2O3 layer (or bilayer)/Rh(111)**.
+- The central morphology comparison is therefore **Ce2O3 cluster vs Ce2O3 crystalline layer on the same Rh substrate**.
+- CeO2-type structures are retained only as support/reference/control or historical calculations unless the supervisor explicitly reopens the composition comparison.
+- The next-step workflow should focus on the discussion-defined energetics, CH4 activation/decomposition sequence, and electronic-structure interpretation of these representative Ce2O3 morphologies.
+
 Created 2026-09-10 after the 9-10 group meeting (supervisor accepted the plan and the two reproduction cases).
-Purpose: supervisor's Q1/Q2 — on the same Rh substrate, compare Ce2O3-type layer vs Ce2O3 cluster vs CeO2-type layer,
-and obtain the interaction / formation energies as a function of the oxygen chemical potential.
+Purpose (updated 2026-09-24): on the same Rh substrate, use Ce2O3 cluster/Rh to represent the amorphous SMSI state and Ce2O3 layer/Rh to represent the crystalline SMSI state, then compare their energetics and the discussion-defined reaction/electronic-structure behavior. CeO2-type models are retained as controls/references rather than as the primary competing overlayer composition.
 
 ## Frozen calculation contract
 
@@ -34,12 +46,12 @@ and obtain the interaction / formation energies as a function of the oxygen chem
 
 | Dir | Atoms | Question | Note |
 |---|---|---|---|
-| 00_Rh111_clean | Rh36 | reference | ISPIN=1 |
+| 00_Rh111_clean | Rh36 | reference | legacy ISPIN=1 result; rerun with ISPIN=2 before use in any new comparison |
 | 10a_Ce2O3_cluster_Odown | Rh36 Ce2 O3 | Q2 cluster | one Ce2O3 unit, O toward Rh (Rh-O contact) |
 | 10b_Ce2O3_cluster_Cedown | Rh36 Ce2 O3 | Q2 cluster | one Ce2O3 unit, Ce toward Rh (Rh-Ce contact) |
-| 10c_Ce2O4_cluster_Odown | Rh36 Ce2 O4 | Q1xQ2 CeO2-type cluster | two CeO2 units, O toward Rh (added after review) |
-| 20a_Ce4O8_layer_regFCC | Rh36 Ce4 O8 | Q1 CeO2 control | Ce0 over fcc hollow |
-| 20b_Ce4O8_layer_regTOP | Rh36 Ce4 O8 | Q1 CeO2 control | Ce0 over top site |
+| 10c_Ce2O4_cluster_Odown | Rh36 Ce2 O4 | CeO2-type control | historical/control model; not the main amorphous-SMSI representation |
+| 20a_Ce4O8_layer_regFCC | Rh36 Ce4 O8 | CeO2 control | retained as control/reference, not mainline SMSI composition |
+| 20b_Ce4O8_layer_regTOP | Rh36 Ce4 O8 | CeO2 control | retained as control/reference, not mainline SMSI composition |
 | 30a_Ce4O6_layer_2Obot | Rh36 Ce4 O6 | Q1/Q3 Ce2O3 layer | two interface O removed |
 | 30b_Ce4O6_layer_2Otop | Rh36 Ce4 O6 | Q1/Q3 Ce2O3 layer | two surface O removed |
 | 30c_Ce4O6_layer_1top1bot | Rh36 Ce4 O6 | Q1/Q3 Ce2O3 layer | one surface + one interface O removed |
