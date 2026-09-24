@@ -33,3 +33,8 @@ For every slab / surface model in this repository, use the following mandatory z
 - Legacy structures that contain a bottom z-offset may remain as archived results, but any new or regenerated production input must follow this convention.
 
 This is a project modeling convention for consistency and unambiguous vacuum-thickness reporting.
+
+## Project-wide plane-wave cutoff rule
+
+- **ENCUT = 450 eV for every new VASP calculation** (new jobs, references, restarts and any system entering a new energy comparison), set by the user on 2026-09-24.
+- Legacy 400 eV (stage 2 rounds 1-2) and 500 eV (round-2 unified single points) results stay as archived records and are not mixed into new comparisons.
