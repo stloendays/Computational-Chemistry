@@ -11,6 +11,20 @@
 
 
 
+
+## Active task — 2026-09-30
+
+See [TASK_20260930_CLUSTER_LAYER_EINT.md](TASK_20260930_CLUSTER_LAYER_EINT.md).
+
+Current comparison requested by the supervisor:
+- build and relax Ce2O3 cluster/Rh(111) and Ce2O4 cluster/Rh(111);
+- compute fixed-stoichiometry interaction energies;
+- compare each cluster directly against the composition-matched layer value normalized as `E_int/2` (Ce4O6 -> Ce2O3 basis; Ce4O8 -> Ce2O4 basis);
+- determine which morphology binds Rh(111) more strongly at Ce:O = 2:3 and 2:4;
+- present the result graphically.
+
+Magnetism rule for new calculations: keep `ISPIN = 2`; by default do not write `MAGMOM`. Add an explicit `MAGMOM` only when a specific magnetic initialization is physically/literature justified and document that basis. Existing completed calculations are not retroactively changed.
+
 ## Current scientific framing — CeOx composition
 
 The mainline interpretation is fixed as follows unless the supervisor explicitly changes it:
