@@ -16,6 +16,8 @@
 
 See [TASK_20260930_CLUSTER_LAYER_EINT.md](TASK_20260930_CLUSTER_LAYER_EINT.md).
 
+Calculations: [cluster_layer_Eint_20260930/](cluster_layer_Eint_20260930/README.md) — Ce2O3/Ce2O4 cluster on Rh(111) 4x4 plus Rh and isolated-cluster references, ENCUT 450, ISPIN 2, no MAGMOM, IBRION 2, no extra single point; submitted 2026-09-30 (PBS 1415466–1415472), monitored every 5 h.
+
 Current comparison requested by the supervisor:
 - build and relax Ce2O3 cluster/Rh(111) and Ce2O4 cluster/Rh(111);
 - compute fixed-stoichiometry interaction energies;
