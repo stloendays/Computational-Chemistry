@@ -80,3 +80,10 @@ Rh bulk E0 = -29.104763 eV / 4 Rh; Ce2O3 A-type AFM E0 = -41.818216 eV / Ce2O3 (
 - Cluster images are 4.2 A apart in the 3x3 cell (period 8.11 A). The low-mismatch alternative is 5x5 Rh with (2sqrt3 x 2sqrt3)R30 oxide (0.4 % vs PBE CeO2; 4x4 would be 6 %); round 2 if the cluster/layer gap is comparable to the film strain energy.
 - 0 K electronic energies only; no ZPE / entropy yet. The mu_O sweep is the only link to the 850 C gas atmospheres.
 - Initial geometries are guesses; three-vacancy patterns and two registries are the minimum, not an exhaustive search.
+
+
+## Literature support for gas-phase thermodynamic mapping
+
+For the O2 and CO2/CO temperature-pressure mapping used in Result 4, including the supporting ab initio thermodynamics literature, ceria-specific precedent, NIST-JANAF gas thermochemistry, and the current provenance warning for the slide value ΔμO* = -1.77 eV, see:
+
+- [results/RESULT4_TP_GAS_MAPPING_LITERATURE_SUPPORT.md](results/RESULT4_TP_GAS_MAPPING_LITERATURE_SUPPORT.md)
