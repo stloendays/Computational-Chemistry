@@ -19,7 +19,6 @@ jobs:
   render:
     runs-on: ubuntu-latest
     env:
-      QT_QPA_PLATFORM: offscreen
       PYTHONUNBUFFERED: "1"
     steps:
       - uses: actions/checkout@v4
@@ -31,13 +30,13 @@ jobs:
       - name: Install OVITO Python and runtime libraries
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgl1 libegl1 libopengl0 libxkbcommon-x11-0 libxcb-cursor0 mesa-vulkan-drivers
+          sudo apt-get install -y libgl1 libegl1 libopengl0 libxkbcommon-x11-0 libxcb-cursor0 mesa-vulkan-drivers xvfb xauth
           python -m pip install --upgrade pip
           python -m pip install ovito pillow
 
       - name: Render layer-vs-cluster morphology figure
         run: |
-          python Rh-CeOx-SMSI/stage2_interfaces_20260910/cluster_layer_Eint_20260930/visualize_layer_cluster_ovito.py
+          xvfb-run -a python Rh-CeOx-SMSI/stage2_interfaces_20260910/cluster_layer_Eint_20260930/visualize_layer_cluster_ovito.py
 
       - name: Upload rendered figure
         uses: actions/upload-artifact@v4
