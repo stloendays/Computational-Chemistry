@@ -24,7 +24,7 @@ from ovito.modifiers import PythonScriptModifier
 from ovito.vis import TachyonRenderer, Viewport
 
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = Path(__file__).resolve().parents[2]
 STAGE2 = ROOT / "stage2_interfaces_20260910"
 STAGE5 = STAGE2 / "cluster_layer_Eint_20260930"
 OUTDIR = STAGE5 / "results" / "ovito"
