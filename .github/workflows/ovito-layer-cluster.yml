@@ -31,7 +31,7 @@ jobs:
       - name: Install OVITO Python and runtime libraries
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgl1 libegl1 libopengl0 libxkbcommon-x11-0 libxcb-cursor0
+          sudo apt-get install -y libgl1 libegl1 libopengl0 libxkbcommon-x11-0 libxcb-cursor0 mesa-vulkan-drivers
           python -m pip install --upgrade pip
           python -m pip install ovito pillow
 
