@@ -1,0 +1,57 @@
+name: Render OVITO layer-vs-cluster figure
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/ovito-layer-cluster.yml"
+      - "Rh-CeOx-SMSI/stage2_interfaces_20260910/cluster_layer_Eint_20260930/visualize_layer_cluster_ovito.py"
+      - "Rh-CeOx-SMSI/stage2_interfaces_20260910/inputs/30d_Ce4O6_layer_Atype/POSCAR"
+      - "Rh-CeOx-SMSI/stage2_interfaces_20260910/inputs/20a_Ce4O8_layer_regFCC/POSCAR"
+      - "Rh-CeOx-SMSI/stage2_interfaces_20260910/cluster_layer_Eint_20260930/inputs/C3b_Ce2O3_Rh_from12a/POSCAR"
+      - "Rh-CeOx-SMSI/stage2_interfaces_20260910/cluster_layer_Eint_20260930/inputs/C4a_Ce2O4_Rh_from10c/POSCAR"
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    env:
+      QT_QPA_PLATFORM: offscreen
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install OVITO Python and runtime libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1 libegl1 libopengl0 libxkbcommon-x11-0 libxcb-cursor0
+          python -m pip install --upgrade pip
+          python -m pip install ovito pillow
+
+      - name: Render layer-vs-cluster morphology figure
+        run: |
+          python Rh-CeOx-SMSI/stage2_interfaces_20260910/cluster_layer_Eint_20260930/visualize_layer_cluster_ovito.py
+
+      - name: Upload rendered figure
+        uses: actions/upload-artifact@v4
+        with:
+          name: ovito-layer-cluster-figure
+          path: Rh-CeOx-SMSI/stage2_interfaces_20260910/cluster_layer_Eint_20260930/results/ovito/
+
+      - name: Commit rendered figure
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Rh-CeOx-SMSI/stage2_interfaces_20260910/cluster_layer_Eint_20260930/results/ovito/
+          if git diff --cached --quiet; then
+            echo "No figure changes to commit."
+          else
+            git commit -m "viz: render OVITO layer-vs-cluster comparison"
+            git push
+          fi
