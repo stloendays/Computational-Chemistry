@@ -1,4 +1,5 @@
 name: Render OVITO layer-vs-cluster figure
+# Reproducible morphology rendering from repository POSCARs.
 
 on:
   workflow_dispatch:
