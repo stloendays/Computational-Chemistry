@@ -1,0 +1,106 @@
+name: Vanda SSH relay
+# Runs `ssh vanda '<cmd>'` from a GitHub runner, for Claude cloud sessions whose
+# container cannot open outbound SSH. The repository is public, so the command
+# output is encrypted to a one-time RSA public key passed in by the caller and
+# only ciphertext reaches the log. Decrypt with tools/vanda-gh/vanda_gh.sh.
+#
+# Repository secrets:
+#   VANDA_GATE_KEY_B64  base64 of the relay ("cloud" account) private key
+#   VANDA_RELAY_HOST    relay address
+
+on:
+  workflow_dispatch:
+    inputs:
+      cmd:
+        description: Command to run on the Vanda login node
+        required: true
+        type: string
+      pubkey:
+        description: Base64 of a one-time RSA public key (PEM) that encrypts the output
+        required: true
+        type: string
+  push:
+    branches:
+      - claude/qstat-user-query-dhxoor
+    paths:
+      - ".github/workflows/vanda-ssh.yml"
+
+permissions: {}
+
+jobs:
+  ssh:
+    if: github.actor == github.repository_owner
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Configure ssh
+        env:
+          KEY_B64: ${{ secrets.VANDA_GATE_KEY_B64 }}
+          RELAY: ${{ secrets.VANDA_RELAY_HOST }}
+        run: |
+          set -euo pipefail
+          if [ -z "$KEY_B64" ] || [ -z "$RELAY" ]; then
+            echo "::error::Secrets VANDA_GATE_KEY_B64 and VANDA_RELAY_HOST must be set"
+            exit 1
+          fi
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s' "$KEY_B64" | tr -d ' \r\n' | base64 -d > ~/.ssh/vanda_gate
+          chmod 600 ~/.ssh/vanda_gate
+          echo "$RELAY ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINisKMYS44D2JChDs+NfvPxDBfunLT/ehNgQD4dqiXvR" > ~/.ssh/known_hosts
+          cat > ~/.ssh/config <<EOF
+          Host vanda
+              HostName $RELAY
+              User cloud
+              IdentityFile ~/.ssh/vanda_gate
+              IdentitiesOnly yes
+              BatchMode yes
+              StrictHostKeyChecking yes
+              ConnectTimeout 30
+              ServerAliveInterval 60
+          EOF
+          chmod 600 ~/.ssh/config
+
+      - name: Connectivity check
+        if: github.event_name == 'push'
+        run: |
+          set +e
+          ssh vanda true < /dev/null > /dev/null 2>&1
+          echo "ssh vanda true -> exit code $?"
+
+      - name: Run command (encrypted output)
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          CMD: ${{ inputs.cmd }}
+          PUBKEY_B64: ${{ inputs.pubkey }}
+        run: |
+          set -euo pipefail
+          umask 077
+          work=$(mktemp -d)
+          printf '%s' "$PUBKEY_B64" | tr -d ' \r\n' | base64 -d > "$work/pub.pem"
+          if ! openssl pkey -pubin -in "$work/pub.pem" -noout 2> /dev/null; then
+            echo "::error::pubkey is not a valid base64 PEM public key"
+            exit 1
+          fi
+          set +e
+          ssh vanda "$CMD" < /dev/null > "$work/out.txt" 2>&1
+          rc=$?
+          set -e
+          echo "remote exit code: $rc"
+          echo "output bytes: $(wc -c < "$work/out.txt")"
+          openssl rand -hex 32 > "$work/k.txt"
+          openssl pkeyutl -encrypt -pubin -inkey "$work/pub.pem" \
+            -pkeyopt rsa_padding_mode:oaep -pkeyopt rsa_oaep_md:sha256 \
+            -in "$work/k.txt" -out "$work/k.enc"
+          gzip -9 -c "$work/out.txt" \
+            | openssl enc -aes-256-cbc -pbkdf2 -salt -pass "file:$work/k.txt" -out "$work/out.enc"
+          echo "-----BEGIN VANDA KEY-----"
+          base64 -w 0 "$work/k.enc"; echo
+          echo "-----END VANDA KEY-----"
+          echo "-----BEGIN VANDA DATA-----"
+          base64 -w 2000 "$work/out.enc"
+          echo "-----END VANDA DATA-----"
+          rm -rf "$work"
+
+      - name: Remove key
+        if: always()
+        run: rm -f ~/.ssh/vanda_gate
