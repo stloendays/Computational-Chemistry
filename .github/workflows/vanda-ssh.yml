@@ -4,7 +4,7 @@ name: Vanda SSH relay
 # output is encrypted to a one-time RSA public key passed in by the caller and
 # only ciphertext reaches the log. Decrypt with tools/vanda-gh/vanda_gh.sh.
 #
-# Repository secrets:
+# Secrets (in the GitHub environment "VANDA_GATE_KEY_B64"):
 #   VANDA_GATE_KEY_B64  base64 of the relay ("cloud" account) private key
 #   VANDA_RELAY_HOST    relay address
 
@@ -31,6 +31,8 @@ jobs:
   ssh:
     if: github.actor == github.repository_owner
     runs-on: ubuntu-latest
+    # The secrets live in this GitHub environment, not at repository level.
+    environment: VANDA_GATE_KEY_B64
     timeout-minutes: 30
     steps:
       - name: Configure ssh

@@ -10,7 +10,7 @@ only ciphertext is written to the job log.
 
 ## One-time setup
 
-Repository → Settings → Secrets and variables → Actions → New repository secret:
+Repository → Settings → Environments → `VANDA_GATE_KEY_B64` → Environment secrets:
 
 | Secret | Value |
 |---|---|
