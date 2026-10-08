@@ -1,8 +1,15 @@
 name: Vanda SSH relay
-# Runs `ssh vanda '<cmd>'` from a GitHub runner, for Claude cloud sessions whose
-# container cannot open outbound SSH. The repository is public, so the command
-# output is encrypted to a one-time RSA public key passed in by the caller and
-# only ciphertext reaches the log. Decrypt with tools/vanda-gh/vanda_gh.sh.
+# Reaches NUS Vanda (`ssh vanda`) from a GitHub runner, for Claude cloud sessions
+# whose container cannot open outbound SSH.
+#
+#   mode=run  run `cmd` on the Vanda login node; output goes to the job log
+#   mode=get  fetch `path` (file or directory) from Vanda as artifact "vanda-get"
+#   mode=put  unpack the repo file `blob` into the Vanda directory `dest`
+#
+# The repository is public, so everything that crosses it is encrypted with
+# AES-256 under a key derived from the relay key (SHA-256 of a label plus the
+# decoded VANDA_GATE_KEY_B64); the client derives the same key locally with
+# tools/vanda-gh/vanda_gh.sh. Logs and artifacts only ever hold ciphertext.
 #
 # Secrets (in the GitHub environment "VANDA_GATE_KEY_B64"):
 #   VANDA_GATE_KEY_B64  base64 of the relay ("cloud" account) private key
@@ -11,16 +18,35 @@ name: Vanda SSH relay
 on:
   workflow_dispatch:
     inputs:
+      mode:
+        description: run | get | put
+        required: true
+        default: run
+        type: choice
+        options: [run, get, put]
       cmd:
-        description: Command to run on the Vanda login node
-        required: true
+        description: "run: command to execute on the Vanda login node"
+        required: false
         type: string
-      pubkey:
-        description: Base64 of a one-time RSA public key (PEM) that encrypts the output
-        required: true
+      path:
+        description: "get: remote file or directory (absolute, or relative to $HOME)"
+        required: false
         type: string
+      blob:
+        description: "put: repository path of the encrypted tar.gz made by vanda_gh.sh pack"
+        required: false
+        type: string
+      dest:
+        description: "put: remote directory to unpack into (created if missing)"
+        required: false
+        type: string
+      overwrite:
+        description: "put: replace files that already exist on Vanda"
+        required: false
+        default: false
+        type: boolean
       timeout_s:
-        description: Seconds before the remote command is killed (the relay hop alone can take ~2 min)
+        description: Seconds before the remote side is killed (the relay hop alone can take ~2 min)
         required: false
         default: "900"
         type: string
@@ -30,7 +56,8 @@ on:
     paths:
       - ".github/workflows/vanda-ssh.yml"
 
-permissions: {}
+permissions:
+  contents: read
 
 jobs:
   ssh:
@@ -38,7 +65,10 @@ jobs:
     runs-on: ubuntu-latest
     # The secrets live in this GitHub environment, not at repository level.
     environment: VANDA_GATE_KEY_B64
-    timeout-minutes: 30
+    timeout-minutes: 60
+    env:
+      MODE: ${{ inputs.mode || 'check' }}
+      TIMEOUT_S: ${{ inputs.timeout_s || '900' }}
     steps:
       - name: Configure ssh
         env:
@@ -50,9 +80,11 @@ jobs:
             echo "::error::Secrets VANDA_GATE_KEY_B64 and VANDA_RELAY_HOST must be set"
             exit 1
           fi
-          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          umask 077
+          mkdir -p ~/.ssh
           printf '%s' "$KEY_B64" | tr -d ' \r\n' | base64 -d > ~/.ssh/vanda_gate
-          chmod 600 ~/.ssh/vanda_gate
+          # Transfer key; must match `vanda_gh.sh key`.
+          { printf 'vanda-transfer-v1'; cat ~/.ssh/vanda_gate; } | sha256sum | cut -d' ' -f1 > ~/.ssh/vanda_xfer
           echo "$RELAY ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINisKMYS44D2JChDs+NfvPxDBfunLT/ehNgQD4dqiXvR" > ~/.ssh/known_hosts
           cat > ~/.ssh/config <<EOF
           Host vanda
@@ -66,32 +98,25 @@ jobs:
               GSSAPIAuthentication no
               ServerAliveInterval 60
           EOF
-          chmod 600 ~/.ssh/config
+          case "$TIMEOUT_S" in ''|*[!0-9]*) echo "TIMEOUT_S=900" >> "$GITHUB_ENV" ;; esac
 
       - name: Connectivity check
-        if: github.event_name == 'push'
+        if: env.MODE == 'check'
         run: |
-          set +e
           start=$(date +%s)
+          set +e
           timeout 600 ssh vanda true < /dev/null > /dev/null 2>&1
           echo "ssh vanda true -> exit code $? after $(( $(date +%s) - start )) s"
 
       - name: Run command (encrypted output)
-        if: github.event_name == 'workflow_dispatch'
+        if: env.MODE == 'run'
         env:
           CMD: ${{ inputs.cmd }}
-          PUBKEY_B64: ${{ inputs.pubkey }}
-          TIMEOUT_S: ${{ inputs.timeout_s }}
         run: |
           set -euo pipefail
+          [ -n "$CMD" ] || { echo "::error::cmd is empty"; exit 1; }
           umask 077
           work=$(mktemp -d)
-          printf '%s' "$PUBKEY_B64" | tr -d ' \r\n' | base64 -d > "$work/pub.pem"
-          if ! openssl pkey -pubin -in "$work/pub.pem" -noout 2> /dev/null; then
-            echo "::error::pubkey is not a valid base64 PEM public key"
-            exit 1
-          fi
-          case "$TIMEOUT_S" in ''|*[!0-9]*) TIMEOUT_S=900 ;; esac
           start=$(date +%s)
           set +e
           timeout "$TIMEOUT_S" ssh vanda "$CMD" < /dev/null > "$work/out.txt" 2>&1
@@ -100,20 +125,79 @@ jobs:
           echo "elapsed: $(( $(date +%s) - start )) s (limit $TIMEOUT_S s)"
           echo "remote exit code: $rc$([ "$rc" -eq 124 ] && echo ' (timed out)')"
           echo "output bytes: $(wc -c < "$work/out.txt")"
-          openssl rand -hex 32 > "$work/k.txt"
-          openssl pkeyutl -encrypt -pubin -inkey "$work/pub.pem" \
-            -pkeyopt rsa_padding_mode:oaep -pkeyopt rsa_oaep_md:sha256 \
-            -in "$work/k.txt" -out "$work/k.enc"
           gzip -9 -c "$work/out.txt" \
-            | openssl enc -aes-256-cbc -pbkdf2 -salt -pass "file:$work/k.txt" -out "$work/out.enc"
-          echo "-----BEGIN VANDA KEY-----"
-          base64 -w 0 "$work/k.enc"; echo
-          echo "-----END VANDA KEY-----"
+            | openssl enc -aes-256-cbc -pbkdf2 -salt -pass file:"$HOME/.ssh/vanda_xfer" -out "$work/out.enc"
           echo "-----BEGIN VANDA DATA-----"
           base64 -w 2000 "$work/out.enc"
           echo "-----END VANDA DATA-----"
           rm -rf "$work"
 
-      - name: Remove key
+      - name: Get from Vanda (encrypted artifact)
+        if: env.MODE == 'get'
+        env:
+          RPATH: ${{ inputs.path }}
+        run: |
+          set -euo pipefail
+          [ -n "$RPATH" ] || { echo "::error::path is empty"; exit 1; }
+          umask 077
+          mkdir -p "$RUNNER_TEMP/get"
+          printf -v qdir '%q' "$(dirname -- "$RPATH")"
+          printf -v qbase '%q' "$(basename -- "$RPATH")"
+          start=$(date +%s)
+          set +e
+          timeout "$TIMEOUT_S" ssh vanda "cd $qdir && tar czf - -- $qbase" < /dev/null \
+            | openssl enc -aes-256-cbc -pbkdf2 -salt -pass file:"$HOME/.ssh/vanda_xfer" -out "$RUNNER_TEMP/get/vanda-get.tar.gz.enc"
+          rc=${PIPESTATUS[0]}
+          set -e
+          echo "elapsed: $(( $(date +%s) - start )) s (limit $TIMEOUT_S s)"
+          echo "remote exit code: $rc$([ "$rc" -eq 124 ] && echo ' (timed out)')"
+          echo "encrypted bytes: $(wc -c < "$RUNNER_TEMP/get/vanda-get.tar.gz.enc")"
+          [ "$rc" -eq 0 ] || exit 1
+
+      - name: Upload artifact
+        if: env.MODE == 'get'
+        uses: actions/upload-artifact@v4
+        with:
+          name: vanda-get
+          path: ${{ runner.temp }}/get/vanda-get.tar.gz.enc
+          retention-days: 1
+          compression-level: 0
+
+      - name: Checkout transfer blob
+        if: env.MODE == 'put'
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Put to Vanda
+        if: env.MODE == 'put'
+        env:
+          BLOB: ${{ inputs.blob }}
+          DEST: ${{ inputs.dest }}
+          OVERWRITE: ${{ inputs.overwrite }}
+        run: |
+          set -euo pipefail
+          [ -n "$BLOB" ] && [ -n "$DEST" ] || { echo "::error::blob and dest are required"; exit 1; }
+          [ -f "$BLOB" ] || { echo "::error::blob not found in repository: $BLOB"; exit 1; }
+          printf -v qdest '%q' "$DEST"
+          keep="--keep-old-files"
+          [ "$OVERWRITE" = "true" ] && keep=""
+          start=$(date +%s)
+          set +e
+          openssl enc -d -aes-256-cbc -pbkdf2 -pass file:"$HOME/.ssh/vanda_xfer" -in "$BLOB" \
+            | timeout "$TIMEOUT_S" ssh vanda "mkdir -p $qdest && tar xzvf - $keep -C $qdest" > "$RUNNER_TEMP/put.txt" 2>&1
+          rc=$?
+          set -e
+          echo "elapsed: $(( $(date +%s) - start )) s (limit $TIMEOUT_S s)"
+          echo "remote exit code: $rc$([ "$rc" -eq 124 ] && echo ' (timed out)')"
+          echo "files listed: $(wc -l < "$RUNNER_TEMP/put.txt")"
+          gzip -9 -c "$RUNNER_TEMP/put.txt" \
+            | openssl enc -aes-256-cbc -pbkdf2 -salt -pass file:"$HOME/.ssh/vanda_xfer" -out "$RUNNER_TEMP/put.enc"
+          echo "-----BEGIN VANDA DATA-----"
+          base64 -w 2000 "$RUNNER_TEMP/put.enc"
+          echo "-----END VANDA DATA-----"
+          [ "$rc" -eq 0 ] || exit 1
+
+      - name: Remove keys
         if: always()
-        run: rm -f ~/.ssh/vanda_gate
+        run: rm -f ~/.ssh/vanda_gate ~/.ssh/vanda_xfer

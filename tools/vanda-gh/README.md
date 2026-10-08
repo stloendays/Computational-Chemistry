@@ -2,11 +2,23 @@
 
 Claude cloud containers cannot open outbound SSH (port 22 is blocked; port 443
 is intercepted by the egress gateway). `.github/workflows/vanda-ssh.yml` runs
-`ssh vanda '<cmd>'` on a GitHub runner instead.
+`ssh vanda` on a GitHub runner instead.
 
-The repository is public, so the output never appears in plain text: the caller
-supplies a one-time RSA public key, the runner encrypts the output with it, and
-only ciphertext is written to the job log.
+| mode | inputs | result |
+|---|---|---|
+| `run` | `cmd` | command output, encrypted, in the job log |
+| `get` | `path` (file or dir; absolute or relative to `$HOME`) | encrypted tar.gz as artifact `vanda-get` (kept 1 day) |
+| `put` | `blob` (repo path made by `pack`), `dest`, `overwrite` | unpacked on Vanda; existing files are kept unless `overwrite` |
+
+All modes take `timeout_s` (default 900). The relay hop alone can take ~2 min.
+
+## Encryption
+
+The repository is public. Everything crossing it (logs, artifacts, upload blobs)
+is AES-256 encrypted with a key derived from the relay key:
+`sha256("vanda-transfer-v1" || decoded VANDA_GATE_KEY_B64)`. The runner derives
+it from the secret, the cloud session from its environment variable of the same
+name; the key itself is never printed or committed.
 
 ## One-time setup
 
@@ -22,9 +34,11 @@ Only the repository owner can trigger the workflow (`if: github.actor == github.
 ## Usage
 
 ```bash
-tools/vanda-gh/vanda_gh.sh keygen  <dir>          # prints the base64 public key
-# dispatch vanda-ssh.yml with inputs cmd=<command>, pubkey=<printed key>
-tools/vanda-gh/vanda_gh.sh decrypt <dir> <log>    # log file or https:// log URL
+K=<scratch>/xfer.key
+tools/vanda-gh/vanda_gh.sh key     $K
+tools/vanda-gh/vanda_gh.sh decrypt $K <log file or URL>          # run / put output
+tools/vanda-gh/vanda_gh.sh pack    $K .vanda-transfer/x.enc FILES # then commit, dispatch put
+tools/vanda-gh/vanda_gh.sh unpack  $K <artifact zip or URL> OUTDIR
 ```
 
-Keep `<dir>` outside the repository (e.g. the session scratchpad).
+Delete `.vanda-transfer/*.enc` after a put.
