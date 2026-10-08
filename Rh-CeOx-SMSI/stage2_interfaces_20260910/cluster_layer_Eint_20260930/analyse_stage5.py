@@ -23,8 +23,8 @@ RAW = os.path.join(HERE, "results", "raw")
 REMOTE = "/scratch/junbotong/Dynamic_SMSI_stage5_cluster_layer_20260930/inputs"
 STAGE4 = os.path.join(HERE, "..", "DynSMSI_stage4_Ce4Ox_layers_20260928", "results", "energetics_stage4.json")
 JOBS = {"R4_Rh111_4x4": "relax", "C3a_Ce2O3_Rh_from12b": "stageB_relax", "C3b_Ce2O3_Rh_from12a": "stageB_relax",
-        "C4a_Ce2O4_Rh_from10c": "stageB_relax", "C4b_Ce2O4_Rh_from12b_plusO": "stageB_relax",
-        "G3_Ce2O3_gas": "stageB_relax", "G4_Ce2O4_gas": "stageB_relax"}
+        "C4a_Ce2O4_Rh_from10c": "stageB_relax_restart", "C4b_Ce2O4_Rh_from12b_plusO": "stageB_relax",
+        "G3_Ce2O3_gas": "stageB_relax", "G4_Ce2O4_gas": "stageB_relax", "GO2_O2_gas": "stageB_relax"}
 CLUSTERS = {"Ce2O3": ["C3a_Ce2O3_Rh_from12b", "C3b_Ce2O3_Rh_from12a"],
             "Ce2O4": ["C4a_Ce2O4_Rh_from10c", "C4b_Ce2O4_Rh_from12b_plusO"]}
 GAS = {"Ce2O3": "G3_Ce2O3_gas", "Ce2O4": "G4_Ce2O4_gas"}
@@ -119,32 +119,100 @@ def main():
             "%.3f" % r["cluster_minus_layer"] if "cluster_minus_layer" in r else "pending", r.get("stronger", "")))
     open(os.path.join(HERE, "results", "stage5_Eint.md"), "w", encoding="utf-8").write("\n".join(md) + "\n")
     print("\n".join(md))
-    if all("cluster_E_int" in r for r in out["comparison"].values()):
-        plot(out["comparison"])
+    plot(out["comparison"])
+    dg = reduction(jobs, out)
+    if dg:
+        out["reduction"] = dg
+        json.dump(out, open(os.path.join(HERE, "results", "stage5_Eint.json"), "w", encoding="utf-8"), indent=1)
 
 
-def plot(cmp_):
+def reduction(jobs, out):
+    """Ce2O4 -> Ce2O3 cluster on Rh(111) vs Ce4O8 -> Ce4O6 layer (stage 4), per Ce, against Delta mu_O.
+
+    dG(dmu_O) = E(reduced/Rh) - E(oxidised/Rh) + n (1/2 E_O2 + dmu_O); cluster n = 1 per 2 Ce, layer n = 2 per 4 Ce.
+    Each line uses the O2 reference of its own batch (stage 5: GO2_O2_gas; stage 4: G_O2).
+    """
+    o2 = jobs.get("GO2_O2_gas", {})
+    c = out["comparison"]
+    if not (o2.get("converged") and "cluster" in c["Ce2O3"] and "cluster" in c["Ce2O4"]):
+        return None
+    st4 = json.load(open(STAGE4, encoding="utf-8"))
+    A_cl = (jobs[c["Ce2O3"]["cluster"]]["E0"] - jobs[c["Ce2O4"]["cluster"]]["E0"] + 0.5 * o2["E0"]) / 2
+    lay = st4["dG"]["Ce$_4$O$_6$"]
+    A_ly = lay["A_per_Ce"]
+    res = {"E_O2_stage5": o2["E0"], "E_O2_stage4": st4["energies"]["G_O2"]["E"],
+           "cluster": {"A_per_Ce": A_cl, "B_per_Ce": 0.5, "dmuO_star": -A_cl / 0.5,
+                       "reduced": c["Ce2O3"]["cluster"], "oxidised": c["Ce2O4"]["cluster"]},
+           "layer": {"A_per_Ce": A_ly, "B_per_Ce": 0.5, "dmuO_star": -A_ly / 0.5}}
+    sys.path.insert(0, os.path.join(os.path.dirname(STAGE4)))
+    from analyse_muO_TP import dmu0, drG_CO2, KB
+    for k in ("cluster", "layer"):
+        mu = res[k]["dmuO_star"]
+        res[k]["T_table"] = [dict(T_C=t, log10_pO2_star=round(float(2 * (mu - dmu0(t + 273.15)) / (KB * (t + 273.15)) / np.log(10)), 2),
+                                  log10_pCO2_pCO_star=round(float((mu - dmu0(t + 273.15) - drG_CO2(t + 273.15)) / (KB * (t + 273.15)) / np.log(10)), 2))
+                             for t in (800, 850)]
+    print(json.dumps(res, indent=1))
+
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+    plt.rcParams.update({"font.family": "Arial", "font.size": 16, "axes.linewidth": 1.3,
+                         "xtick.direction": "in", "ytick.direction": "in"})
+    mu = np.linspace(-3.4, 0.0, 200)
+    fig, ax = plt.subplots(figsize=(7.5, 5.2), dpi=200)
+    for k, col, lab in (("cluster", "#C0392B", r"cluster: Ce$_2$O$_4$ → Ce$_2$O$_3$"),
+                        ("layer", "#2C5AA0", r"layer: Ce$_4$O$_8$ → Ce$_4$O$_6$")):
+        r = res[k]
+        ax.plot(mu, r["A_per_Ce"] + 0.5 * mu, color=col, lw=2.5, label=lab)
+        ax.plot(r["dmuO_star"], 0, "o", color=col, ms=9)
+        ax.annotate(("%.2f" % r["dmuO_star"]).replace("-", "−"), (r["dmuO_star"], 0), xytext=(0, -26 if k == "cluster" else 12),
+                    textcoords="offset points", ha="center", color=col, fontsize=15)
+    mu_ref = float(dmu0(1123.15) + drG_CO2(1123.15))
+    res["dmuO_850C_CO2_CO_1to1"] = round(mu_ref, 3)
+    ax.axvline(mu_ref, color="#555555", ls="--", lw=1.5)
+    ax.text(mu_ref + 0.05, 0.05, "850 °C\nCO$_2$/CO = 1", fontsize=13, va="bottom")
+    ax.axhline(0, color="k", lw=1)
+    ax.set_xlim(-3.4, 0.0)
+    ax.set_xlabel(r"Δμ$_O$ (eV)")
+    ax.set_ylabel("ΔG per Ce (eV)")
+    ax.legend(frameon=False, loc="lower right", fontsize=14)
+    ax.set_title("ΔG < 0: reduced Ce$^{3+}$ phase is stable", fontsize=15)
+    fig.tight_layout()
+    fig.savefig(os.path.join(HERE, "results", "Fig_dG_cluster_vs_layer.png"))
+    return res
+
+
+def plot(cmp_):
+    """Cluster and layer bars side by side; a cluster value not yet available is left as an empty dashed bar."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.patches import Patch
     plt.rcParams.update({"font.family": "Arial", "font.size": 16})
     comps = ["Ce2O3", "Ce2O4"]
     labels = [r"Ce$_2$O$_3$ (Ce:O = 2:3)", r"Ce$_2$O$_4$ (Ce:O = 2:4)"]
-    cl = [cmp_[c]["cluster_E_int"] for c in comps]
+    cl = [cmp_[c].get("cluster_E_int") for c in comps]
     ly = [cmp_[c]["layer_E_int_per_unit"] for c in comps]
+    known = [v for v in cl + ly if v is not None]
+    ymin = min(known) * 1.45
     x, w = np.arange(2), 0.34
     fig, ax = plt.subplots(figsize=(7.5, 5.2), dpi=200)
-    b1 = ax.bar(x - w / 2, cl, w, color="#C0392B", label="cluster/Rh(111)")
-    b2 = ax.bar(x + w / 2, ly, w, color="#2C5AA0", label="layer/Rh(111), E$_{int}$/2")
-    for bars in (b1, b2):
-        for r in bars:
-            ax.text(r.get_x() + r.get_width() / 2, r.get_height() - 0.08, "%.2f" % r.get_height(),
-                    ha="center", va="top", fontsize=15)
+    for xi, v in zip(x - w / 2, cl):
+        if v is None:
+            ax.text(xi, -0.1, "pending", ha="center", va="top", rotation=90, fontsize=15, color="#C0392B")
+        else:
+            ax.bar(xi, v, w, color="#C0392B")
+            ax.text(xi, v - 0.08, ("%.2f" % v).replace("-", "−"), ha="center", va="top", fontsize=15)
+    for xi, v in zip(x + w / 2, ly):
+        ax.bar(xi, v, w, color="#2C5AA0")
+        ax.text(xi, v - 0.08, ("%.2f" % v).replace("-", "−"), ha="center", va="top", fontsize=15)
     ax.axhline(0, color="k", lw=1)
     ax.set_xticks(x, labels)
     ax.set_ylabel(r"E$_{int}$ per Ce$_2$O$_y$ unit (eV)")
-    ax.set_ylim(min(cl + ly) * 1.25, 0.3)
-    ax.legend(frameon=False, loc="lower left")
+    ax.set_ylim(ymin, 0.3)
+    ax.set_xlim(-0.6, 1.6)
+    ax.legend(handles=[Patch(color="#C0392B", label="cluster/Rh(111)"),
+                       Patch(color="#2C5AA0", label="layer/Rh(111), E$_{int}$/2")], frameon=False, loc="lower center", ncol=2, fontsize=14)
     ax.set_title("More negative E$_{int}$ = stronger interaction with Rh(111)", fontsize=15)
     fig.tight_layout()
     fig.savefig(os.path.join(HERE, "results", "Fig_cluster_vs_layer_Eint.png"))

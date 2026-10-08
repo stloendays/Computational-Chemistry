@@ -1,0 +1,173 @@
+{
+ "jobs": {
+  "R4_Rh111_4x4": {
+   "ionic_steps": 8,
+   "E0": -439.68688,
+   "mag_total": 0.0007,
+   "converged": true,
+   "Fmax_free": 0.0017682468719044861,
+   "Ce_moments": [],
+   "n_Ce3+": 0,
+   "max_Rh_moment": 0.001,
+   "status": "converged"
+  },
+  "C3a_Ce2O3_Rh_from12b": {
+   "ionic_steps": 19,
+   "E0": -478.37273,
+   "mag_total": 2.0499,
+   "converged": true,
+   "Fmax_free": 0.015961193627044314,
+   "Ce_moments": [
+    0.997,
+    0.997
+   ],
+   "n_Ce3+": 2,
+   "max_Rh_moment": 0.003,
+   "status": "converged"
+  },
+  "C3b_Ce2O3_Rh_from12a": {
+   "ionic_steps": 8,
+   "E0": -477.8821,
+   "mag_total": 1.9,
+   "converged": true,
+   "Fmax_free": 0.016609974744110842,
+   "Ce_moments": [
+    0.982,
+    0.997
+   ],
+   "n_Ce3+": 2,
+   "max_Rh_moment": 0.029,
+   "status": "converged"
+  },
+  "C4a_Ce2O4_Rh_from10c": {
+   "ionic_steps": 46,
+   "E0": -485.76487,
+   "mag_total": 2.0372,
+   "converged": true,
+   "Fmax_free": 0.018327593759138158,
+   "Ce_moments": [
+    0.997,
+    0.993
+   ],
+   "n_Ce3+": 2,
+   "max_Rh_moment": 0.007,
+   "status": "converged"
+  },
+  "C4b_Ce2O4_Rh_from12b_plusO": {
+   "ionic_steps": 26,
+   "E0": -485.69049,
+   "mag_total": 1.9125,
+   "converged": true,
+   "Fmax_free": 0.01735661931367972,
+   "Ce_moments": [
+    0.973,
+    0.995
+   ],
+   "n_Ce3+": 2,
+   "max_Rh_moment": 0.031,
+   "status": "converged"
+  },
+  "G3_Ce2O3_gas": {
+   "ionic_steps": 5,
+   "E0": -34.234306,
+   "mag_total": 2.0,
+   "converged": true,
+   "Fmax_free": 0.01913569711298755,
+   "Ce_moments": [
+    0.994,
+    0.976
+   ],
+   "n_Ce3+": 2,
+   "max_Rh_moment": 0.0,
+   "status": "converged"
+  },
+  "G4_Ce2O4_gas": {
+   "ionic_steps": 1,
+   "E0": -40.93264,
+   "mag_total": 0.0,
+   "converged": true,
+   "Fmax_free": 0.016728851036457944,
+   "Ce_moments": [
+    -0.0,
+    -0.001
+   ],
+   "n_Ce3+": 0,
+   "max_Rh_moment": 0.0,
+   "status": "converged"
+  },
+  "GO2_O2_gas": {
+   "ionic_steps": 3,
+   "E0": -9.8782722,
+   "mag_total": 2.0,
+   "converged": true,
+   "Fmax_free": 0.004840000103305784,
+   "Ce_moments": [],
+   "n_Ce3+": 0,
+   "max_Rh_moment": 0.0,
+   "status": "converged"
+  }
+ },
+ "comparison": {
+  "Ce2O3": {
+   "layer_E_int_cell": -3.267,
+   "layer_E_int_per_unit": -1.6335,
+   "E_int_C3a_Ce2O3_Rh_from12b": -4.451544000000013,
+   "E_int_C3b_Ce2O3_Rh_from12a": -3.9609140000000025,
+   "cluster": "C3a_Ce2O3_Rh_from12b",
+   "cluster_E_int": -4.451544000000013,
+   "cluster_minus_layer": -2.818044000000013,
+   "stronger": "cluster"
+  },
+  "Ce2O4": {
+   "layer_E_int_cell": -6.008,
+   "layer_E_int_per_unit": -3.004,
+   "E_int_C4a_Ce2O4_Rh_from10c": -5.145350000000008,
+   "E_int_C4b_Ce2O4_Rh_from12b_plusO": -5.070970000000045,
+   "cluster": "C4a_Ce2O4_Rh_from10c",
+   "cluster_E_int": -5.145350000000008,
+   "cluster_minus_layer": -2.1413500000000076,
+   "stronger": "cluster"
+  }
+ },
+ "reduction": {
+  "E_O2_stage5": -9.8782722,
+  "E_O2_stage4": -9.8782748,
+  "cluster": {
+   "A_per_Ce": 1.2265019499999918,
+   "B_per_Ce": 0.5,
+   "dmuO_star": -2.4530038999999837,
+   "reduced": "C3a_Ce2O3_Rh_from12b",
+   "oxidised": "C4a_Ce2O4_Rh_from10c",
+   "T_table": [
+    {
+     "T_C": 800,
+     "log10_pO2_star": -11.84,
+     "log10_pCO2_pCO_star": 3.3
+    },
+    {
+     "T_C": 850,
+     "log10_pO2_star": -10.74,
+     "log10_pCO2_pCO_star": 3.24
+    }
+   ]
+  },
+  "layer": {
+   "A_per_Ce": 0.8857,
+   "B_per_Ce": 0.5,
+   "dmuO_star": -1.7714,
+   "T_table": [
+    {
+     "T_C": 800,
+     "log10_pO2_star": -5.44,
+     "log10_pCO2_pCO_star": 6.5
+    },
+    {
+     "T_C": 850,
+     "log10_pO2_star": -4.62,
+     "log10_pCO2_pCO_star": 6.3
+    }
+   ]
+  },
+  "dmuO_850C_CO2_CO_1to1": -3.176
+ }
+}
