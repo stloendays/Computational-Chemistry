@@ -19,6 +19,11 @@ on:
         description: Base64 of a one-time RSA public key (PEM) that encrypts the output
         required: true
         type: string
+      timeout_s:
+        description: Seconds before the remote command is killed (the relay hop alone can take ~2 min)
+        required: false
+        default: "900"
+        type: string
   push:
     branches:
       - claude/qstat-user-query-dhxoor
@@ -58,6 +63,7 @@ jobs:
               BatchMode yes
               StrictHostKeyChecking yes
               ConnectTimeout 30
+              GSSAPIAuthentication no
               ServerAliveInterval 60
           EOF
           chmod 600 ~/.ssh/config
@@ -66,14 +72,16 @@ jobs:
         if: github.event_name == 'push'
         run: |
           set +e
-          ssh vanda true < /dev/null > /dev/null 2>&1
-          echo "ssh vanda true -> exit code $?"
+          start=$(date +%s)
+          timeout 600 ssh vanda true < /dev/null > /dev/null 2>&1
+          echo "ssh vanda true -> exit code $? after $(( $(date +%s) - start )) s"
 
       - name: Run command (encrypted output)
         if: github.event_name == 'workflow_dispatch'
         env:
           CMD: ${{ inputs.cmd }}
           PUBKEY_B64: ${{ inputs.pubkey }}
+          TIMEOUT_S: ${{ inputs.timeout_s }}
         run: |
           set -euo pipefail
           umask 077
@@ -83,11 +91,14 @@ jobs:
             echo "::error::pubkey is not a valid base64 PEM public key"
             exit 1
           fi
+          case "$TIMEOUT_S" in ''|*[!0-9]*) TIMEOUT_S=900 ;; esac
+          start=$(date +%s)
           set +e
-          ssh vanda "$CMD" < /dev/null > "$work/out.txt" 2>&1
+          timeout "$TIMEOUT_S" ssh vanda "$CMD" < /dev/null > "$work/out.txt" 2>&1
           rc=$?
           set -e
-          echo "remote exit code: $rc"
+          echo "elapsed: $(( $(date +%s) - start )) s (limit $TIMEOUT_S s)"
+          echo "remote exit code: $rc$([ "$rc" -eq 124 ] && echo ' (timed out)')"
           echo "output bytes: $(wc -c < "$work/out.txt")"
           openssl rand -hex 32 > "$work/k.txt"
           openssl pkeyutl -encrypt -pubin -inkey "$work/pub.pem" \
