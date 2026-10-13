@@ -51,6 +51,24 @@ DFT：VASP 5.4.4，PBE + DFT-D3，PAW，CI-NEB；模型 Ir₇/CeO₂₋ₓ(110)�
 
 可借鉴之处：(i) CH₄ → CH₃ → CH₂ 两步脱氢 + CH₂ 分叉（氧化 vs 继续脱氢）这一最小 DRM 网络；(ii) CO₂ 在 O_v/Ce³⁺ 处解离补氧，构成 Mars–van Krevelen 循环；(iii) 用“RDS 能垒 + CH₂* 分叉选择性”来对比不同界面。
 
+### 3.1 其他文献（2026-10-13 检索；DOI 经 Crossref 核对，[全文]/[摘要] 表示阅读程度）
+
+未找到 CeOx/Rh(111)（含 Ce₂O₃ 覆盖层）上 CH₄/DRM 的 DFT 研究，也未找到含 Rh–CeOx 界面的 DRM DFT——本课题的 Ce₂O₃ layer vs cluster on Rh(111) 路径对比是空白。可直接借鉴的模板：
+
+| 文献 | 模型 / 结论（原文数值） | 用途 |
+|---|---|---|
+| Lustemberg *et al.*, ACS Catal. 6, 8184 (2016), 10.1021/acscatal.6b02360 [全文] | PBE+U(4.5)，Ni/CeO₂(111) 与 Ni/Ce₂O₃(0001)；CH₄→CH₃+H 0.7–0.8 eV（Ni(111) 引用 0.9–1.1）；C 吸附能作积碳描述符 | 金属/Ce₂O₃ 的 DFT+U 建模；C* 描述符 |
+| Liu *et al.*, Angew. Chem. 56, 13041 (2017), 10.1002/anie.201707538 [全文] | CH₄→CH₃+H：Co(0001) 1.07，Cu(111) 1.64，Co/Ce₂O₃(0001) 0.05 eV | “金属 + 还原态 Ce₂O₃”作为 DRM 活性相 |
+| Liu *et al.*, Angew. Chem. 55, 7455 (2016), 10.1002/anie.201602489 [摘要] | 有效 CH₄ 活化能垒 Ni(111) 0.9 → Ni/CeO₂₋ₓ(111) 0.15 eV | 干净金属 vs 金属/还原 CeOx 的论证方式 |
+| Zuo *et al.*, JACS 138, 13810 (2016), 10.1021/jacs.6b08668 [全文] | 反载型 CeO₂/Cu₂O/Cu(111)：CH₄ 在 Cu₂O/Cu 1.60 eV，界面 Ce⁴⁺/O 0.51 eV | 氧化物岛/金属界面 O 参与 C–H 断裂（对应模型 B） |
+| Lustemberg *et al.*, ACS Catal. 11, 10604 (2021), 10.1021/acscatal.1c02154 [全文] | 系统比较 Ni 团簇尺寸与界面位；Brønsted 标度关系偏离 | 位点比较与标度关系论证 |
+| Wang, Song, Zhang, Appl. Surf. Sci. 258, 3714 (2012), 10.1016/j.apsusc.2011.12.012 [全文] | Rh(111)（PW91）：CH₄→CH₃ 79.4，CH₃→CH₂ 52.7，CH₂→CH 6.3，CH→C 108.1 kJ/mol | 模型 A 脱氢基准 |
+| Díaz López, Comas-Vives, Catal. Sci. Technol. 13, 7162 (2023), 10.1039/d3cy01546g [摘要] | Rh(111) DRM 38 步 DFT+kMC；CO₂ 直接解离，CH*+O* 生成第二个 CO | 模型 A 的完整网络 |
+| Kim *et al.*, Nat. Commun. 11, 5649 (2020), 10.1038/s41467-020-19398-1 [全文] | Rh(111) CO₂→CO*+O*：Ea 0.58 eV，ΔE −0.82 eV（RPBE-D3） | R8 在 Rh 上的基准 |
+| Kettner *et al.*, J. Phys. Chem. C 120, 26782 (2016), 10.1021/acs.jpcc.6b07431 [摘要] | 实验：CeOx/Rh(111) 反载型模型催化剂真实存在 | B、C 结构模型的实验依据 |
+
+据此在第 4 节补充：各模型 C* 吸附能（积碳描述符，3 个便宜计算）；模型 A 的 CH₂→CH→C 与 CH*+O* 支路按 Rh(111) 文献做基准。项目合同仍为 Ueff = 5 eV、ENCUT 450 eV（文献中 4.5 eV/415 eV 不改变本项目设定）。
+
 ## 4. 建议计算的反应路径（待与 Dr. Xiaoyan Li 确认）
 
 **Phase 1 — CH₄ 活化（必做，优先）**
@@ -60,6 +78,7 @@ DFT：VASP 5.4.4，PBE + DFT-D3，PAW，CI-NEB；模型 Ir₇/CeO₂₋ₓ(110)�
 | R1 | CH₄(g) → CH₄* | 吸附能 |
 | R2 | CH₄* → CH₃* + H* | 反应能 + CI-NEB 能垒 |
 | R3 | CH₃* + H* → CH₂* + 2H* | 反应能 + CI-NEB 能垒 |
+| D1 | C*（各模型最优位） | 吸附能，积碳描述符（Lustemberg 2016） |
 
 **Phase 2 — DRM 中 CHₓ 的去向与补氧（按参考文献模板）**
 
