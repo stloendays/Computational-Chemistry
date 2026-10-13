@@ -17,8 +17,10 @@ Contract (= Stage 5, plus the final single point required by the project rules):
   Optional --d3 adds IVDW = 12 (D3-BJ) to every system of the set; default off (current project contract).
 
 Usage:  python build_stage6.py [--layer PATH_TO_RELAXED_LAYER_CONTCAR] [--d3]
-  The mainline layer parent is the Stage-3 S1_31_Ce4O6_layer_Rh3x3 CONTCAR (450 eV, ISPIN 2) on Vanda; when it is
-  not given, the round-1 30a CONTCAR in this repository is used and the inputs are marked PREVIEW.
+  The layer parent is the relaxed Stage-4 L6_Ce4O6_Rh CONTCAR (450 eV, ISPIN 2; the layer behind the Stage-5 layer
+  E_int = -3.267 eV), copied from Vanda to parents/. --layer overrides it.
+  MAXMIX is kept only in the stage-A single point: carried across ionic steps it made the Stage-5 C4a relaxation
+  diverge (BRMIX, 2026-10-06), so stage B/C use the default mixing history.
 """
 import argparse
 import hashlib
@@ -34,8 +36,7 @@ ROOT = os.path.dirname(HERE)
 S5 = os.path.join(ROOT, "stage2_interfaces_20260910", "results", "cluster_layer_Eint_20260930")
 PARENT = {"A": os.path.join(S5, "R4_Rh111_4x4", "CONTCAR"),
           "B": os.path.join(S5, "C3a_Ce2O3_Rh_from12b", "CONTCAR"),
-          "C": os.path.join(ROOT, "stage2_interfaces_20260910", "results", "CONTCAR_relaxed",
-                            "CONTCAR_30a_Ce4O6_layer_2Obot")}
+          "C": os.path.join(HERE, "parents", "CONTCAR_L6_Ce4O6_Rh_stage4")}
 JOB_TEMPLATE = os.path.join(ROOT, "stage2_interfaces_20260910", "cluster_layer_Eint_20260930", "inputs",
                             "C3a_Ce2O3_Rh_from12b", "job.pbs")
 KMESH = {"A": (3, 3, 1), "B": (3, 3, 1), "C": (4, 4, 1)}
@@ -234,7 +235,9 @@ def ldau(syms):
 def incar(system, syms, stage, kind, d3):
     t = [f"SYSTEM = {system} | {stage}", "PREC = Accurate", "ENCUT = 450", "ISPIN = 2", "ISYM = 0",
          "LREAL = .FALSE.", "LASPH = .TRUE.", "ADDGRID = .TRUE.", "LORBIT = 11", "NELMIN = 4", "AMIN = 0.01",
-         "MAXMIX = 40", "AMIX_MAG = 0.4", "BMIX_MAG = 1.0"]
+         "AMIX_MAG = 0.4", "BMIX_MAG = 1.0"]
+    if stage == "stageA_spinSP":
+        t += ["MAXMIX = 40"]
     if kind == "slab":
         smear = ["ISMEAR = 0", "SIGMA = 0.05"] if stage == "stageC_SP" else ["ISMEAR = 1", "SIGMA = 0.10"]
         t += smear + ["IDIPOL = 3", "LDIPOL = .FALSE.", "KPAR = 4", "NCORE = 3"]
@@ -315,15 +318,14 @@ def write_set(root, name, title, a, kind, mesh, d3):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--layer", help="relaxed 450 eV / ISPIN 2 Ce4O6/Rh(111) 3x3 CONTCAR (Stage-3 S1_31)")
+    ap.add_argument("--layer", help="override the Stage-4 L6 Ce4O6/Rh(111) 3x3 parent")
     ap.add_argument("--d3", action="store_true", help="add IVDW = 12 to every system")
     ap.add_argument("--out", default=os.path.join(HERE, "inputs"))
     args = ap.parse_args()
-    preview = args.layer is None
     PARENT["C"] = args.layer or PARENT["C"]
     builders = {"A": model_A, "B": model_B, "C": model_C}
     labels = {"A": "Rh(111) p(4x4)", "B": "Ce2O3 cluster C3a/Rh(111) p(4x4)",
-              "C": "Ce4O6 layer/Rh(111) p(3x3)" + (" [PREVIEW: round-1 30a parent]" if preview else "")}
+              "C": "Ce4O6 layer (Stage-4 L6)/Rh(111) p(3x3)"}
     os.makedirs(args.out, exist_ok=True)
     report = []
     for m in "ABC":
@@ -357,13 +359,16 @@ def main():
             if f in ("MANIFEST.sha256", "BUILD_REPORT.txt"):
                 continue
             p = os.path.join(dp, f)
+            raw = open(p, "rb").read()                    # LF only: Windows text mode writes CRLF, which bash rejects
+            if b"\r\n" in raw:
+                open(p, "wb").write(raw.replace(b"\r\n", b"\n"))
             lines.append("%s  %s" % (hashlib.sha256(open(p, "rb").read()).hexdigest(),
                                      os.path.relpath(p, args.out).replace("\\", "/")))
     with open(os.path.join(args.out, "MANIFEST.sha256"), "w") as fh:
         fh.write("\n".join(lines) + "\n")
     with open(os.path.join(args.out, "BUILD_REPORT.txt"), "w") as fh:
-        fh.write(("PREVIEW (layer parent = round-1 30a; rebuild with --layer S1_31 CONTCAR before submission)\n"
-                  if preview else "layer parent: %s\n" % args.layer) + ("IVDW = 12\n" if args.d3 else "no IVDW\n"))
+        fh.write("parents: " + "; ".join("%s=%s" % (m, os.path.relpath(PARENT[m], HERE).replace("\\", "/"))
+                                         for m in "ABC") + "\n" + ("IVDW = 12\n" if args.d3 else "no IVDW\n"))
         fh.write("\n".join(report) + "\n")
     print("wrote %d files to %s" % (len(lines), args.out))
 

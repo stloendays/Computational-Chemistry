@@ -1,4 +1,4 @@
-SYSTEM = Ce4O6 layer/Rh(111) p(3x3) [PREVIEW: round-1 30a parent] | C2_CH4_Os | stageC_SP
+SYSTEM = Ce4O6 layer (Stage-4 L6)/Rh(111) p(3x3) | C2_CH4_Os | stageC_SP
 PREC = Accurate
 ENCUT = 450
 ISPIN = 2
@@ -9,7 +9,6 @@ ADDGRID = .TRUE.
 LORBIT = 11
 NELMIN = 4
 AMIN = 0.01
-MAXMIX = 40
 AMIX_MAG = 0.4
 BMIX_MAG = 1.0
 ISMEAR = 0

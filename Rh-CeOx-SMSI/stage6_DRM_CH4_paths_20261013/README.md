@@ -1,6 +1,6 @@
 # Stage 6 — DRM 中 CH₄ 转化反应路径：Rh(111) / Ce₂O₃ cluster/Rh(111) / Ce₂O₃ layer/Rh(111)
 
-创建：2026-10-13。状态：**路径方案 + Phase-1 预览输入已准备；尚未提交任何计算**。按老师要求，先确定路径并与 Dr. Xiaoyan Li 更新，确认后再上 Vanda 提交。
+创建：2026-10-13。状态：**路径方案 + Phase-1 提交版输入已准备（layer = Stage-4 L6）；尚未提交任何计算**。按老师要求，先确定路径并与 Dr. Xiaoyan Li 更新，确认后再上 Vanda 提交。
 
 ## 1. 任务来源（导师 2026-10-13 笔记，作为验收标准）
 
@@ -99,7 +99,7 @@ Phase 1 先做完三种模型的 R1–R3，给出“CH₄ 活化能垒 + 能量�
 |---|---|---|
 | A Rh(111) p(4×4) | Stage-5 R4 CONTCAR | Rh top / fcc（基准） |
 | B Ce₂O₃ cluster/Rh(111) p(4×4) | Stage-5 C3a（最稳定 cluster）CONTCAR | 周边 Rh（Rh–O–Ce 界面）、cluster 顶 O（O_t）、Ce、远离 cluster 的 Rh |
-| C Ce₂O₃ layer (Ce₄O₆)/Rh(111) p(3×3) | Stage-3 S1_31（450 eV, ISPIN 2）CONTCAR | 表面 O（O_s）、Ce、Ce–O 对 |
+| C Ce₂O₃ layer (Ce₄O₆)/Rh(111) p(3×3) | Stage-4 L6_Ce4O6_Rh 弛豫 CONTCAR（450 eV, ISPIN 2；即 Stage-5 层 E_int −3.267 eV 所用结构，`parents/`） | 表面 O（O_s）、Ce、Ce–O 对 |
 
 Phase-1 初始构型（`inputs/`，每个模型各取若干起点，取最低者）：
 
@@ -139,10 +139,25 @@ CI-NEB（VTST 已编译进 `vasp_632_vtst_solpp_beef_std`）：5–7 个 image�
 2. Ce₂O₃ layer 模型：沿用 Stage 5 比较所用的 Ce₄O₆/Rh(111) p(3×3)（层上只有一个 Ce 平面）；实验描述为“双层 Ce₂O₃”，是否需要另建两个 Ce 平面的 Ce₈O₁₂/Rh(111) 双层模型？
 3. 范德华修正：CH₄ 物理吸附与参考文献均用 DFT-D3；当前项目合同无 IVDW。是否在 Stage 6 全体系统一加 D3（`build_stage6.py --d3`）？
 4. Layer 上 R4b 使用 Ce₂O₃ 晶格 O（产生 O_v，再由 CO₂ 在 R8 补回），按参考文献的 MvK 循环处理，是否同意？
+5. Layer 边界位：Ce₄O₆/Rh(111) p(3×3) 把 Rh 完全盖住，CH₄ 只能在 Ce/O_s 上活化；文献中“金属/Ce₂O₃”低能垒（Co/Ce₂O₃ 0.05 eV、Ni/CeO₂₋ₓ 0.15 eV）都出现在金属–氧化物界面。
+   是否加一个 layer 条带模型（Ce₂O₃ 条带 + 一排裸露 Rh，即 layer 的 Rh–Ce₂O₃ 边界）作为模型 C′，与 cluster 周边位（B）对等比较？
 
 ## 9. 文件与复现
 
 - `build_stage6.py`：生成 Phase-1 全部输入（POSCAR、INCAR_stageA/B/C、KPOINTS、POTCAR.spec、job.pbs、MANIFEST.sha256、BUILD_REPORT.txt）。
-  `python build_stage6.py --layer <Vanda 上 S1_31_Ce4O6_layer_Rh3x3 的 CONTCAR> [--d3]`。
-- `inputs/`：当前为 **PREVIEW**（layer 父结构暂用仓库内 round-1 30a CONTCAR，因为本会话无法连接 Vanda 取 S1_31 CONTCAR）。提交前必须用 S1_31 CONTCAR 重新生成。
+  `python build_stage6.py [--d3]`；三个父结构：A = Stage-5 R4、B = Stage-5 C3a、C = `parents/CONTCAR_L6_Ce4O6_Rh_stage4`（2026-10-13 从 Vanda
+  `/scratch/junbotong/Dynamic_SMSI_stage4_Ce4Ox_layers_20260928/inputs/L6_Ce4O6_Rh/CONTCAR` 取回）。
+- `inputs/`：**提交版**（2026-10-13 用 L6 重建，替换此前的 round-1 30a 预览版）；所有文件 LF 行尾，`MANIFEST.sha256` 与之对应。
 - 所有坐标都是初始猜测，不是结果。
+
+## 10. 2026-10-13 本地复核（ComputeChem 会话）
+
+- **方法 B 数值复核：**JANAF 1100/1200 K 插值 Δ_fG°(CO₂) −395.73、Δ_fG°(CO) −211.09 kJ/mol → Δ_rG° = 184.6 kJ/mol = 1.914 eV，
+  K_p = 2.6 × 10⁻⁹；1 bar 纯 CO₂：p_CO = 2.4 × 10⁻⁶ bar、log₁₀(p_CO₂/p_CO) = 5.62、Δμ_O = −1.92 eV，与第 2 节一致。
+  O₂ 杂质是唯一能把点推过 layer 边界（−1.77 eV）的因素：1 bar 下 10 ppm O₂ 给 −1.81 eV，24 ppm 到边界；向合作者确认 CO₂ 纯度与气室压力即可定点。
+- **Layer 父结构改为 Stage-4 L6**（老师笔记中 “done” 的 layer 结论来自 L6 → Stage-5 E_int −3.267 eV），不再用 Stage-3 S1_31 或 round-1 30a。
+- **L6 的结构是一个 Ce 平面：**界面 2 O（z 8.58 Å）– 4 Ce（9.56–9.69 Å）– 表面 4 O（10.02–10.36 Å），即 O–Ce–O 三原子层；
+  完整 Ce₂O₃(0001) 双层（两个 Ce 平面，Ce₈O₁₂/Rh p(3×3)）尚未计算 → 第 8 节第 2 条需老师定。
+- **INCAR 修正：**MAXMIX 40 只留在 stage A 单点；Stage-5 C4a 在弛豫中跨离子步保留混合历史导致 BRMIX 发散（2026-10-06），B/C 段不再写。
+- **Windows 行尾：**生成脚本统一写 LF（CRLF 的 job.pbs 会被 bash 拒绝），MANIFEST 按 LF 内容计算。
+- Vanda 上仍有一个 Stage-3 遗留的挂起作业 1403405（sp_S1_11a，状态 H），与 Stage 6 无关。
