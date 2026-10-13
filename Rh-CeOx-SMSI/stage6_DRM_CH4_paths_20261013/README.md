@@ -137,7 +137,7 @@ CI-NEB（VTST 已编译进 `vasp_632_vtst_solpp_beef_std`）：5–7 个 image�
 
 1. 路径范围：先做 Phase 1（R1–R3）给出初步对比，再按第 4 节做 Phase 2 的 CH₂ 分叉 + CO₂ 补氧，是否同意？
 2. Ce₂O₃ layer 模型：沿用 Stage 5 比较所用的 Ce₄O₆/Rh(111) p(3×3)（层上只有一个 Ce 平面）；实验描述为“双层 Ce₂O₃”，是否需要另建两个 Ce 平面的 Ce₈O₁₂/Rh(111) 双层模型？
-3. ~~范德华修正~~ **已定（用户 2026-10-13）：不加 D3**，沿用项目合同（无 IVDW），`build_stage6.py` 不带 `--d3`。
+3. ~~范德华修正~~ **已定（用户 2026-10-13）：主线不加 D3**，`build_stage6.py` 不带 `--d3`；D3 影响另做敏感性测试，见 `../analysis_20261013/D3_sensitivity/`。
 4. Layer 上 R4b 使用 Ce₂O₃ 晶格 O（产生 O_v，再由 CO₂ 在 R8 补回），按参考文献的 MvK 循环处理，是否同意？
 5. Layer 边界位：Ce₄O₆/Rh(111) p(3×3) 把 Rh 完全盖住，CH₄ 只能在 Ce/O_s 上活化；文献中“金属/Ce₂O₃”低能垒（Co/Ce₂O₃ 0.05 eV、Ni/CeO₂₋ₓ 0.15 eV）都出现在金属–氧化物界面。
    是否加一个 layer 条带模型（Ce₂O₃ 条带 + 一排裸露 Rh，即 layer 的 Rh–Ce₂O₃ 边界）作为模型 C′，与 cluster 周边位（B）对等比较？
