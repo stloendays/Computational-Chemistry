@@ -137,7 +137,7 @@ CI-NEB（VTST 已编译进 `vasp_632_vtst_solpp_beef_std`）：5–7 个 image�
 
 1. 路径范围：先做 Phase 1（R1–R3）给出初步对比，再按第 4 节做 Phase 2 的 CH₂ 分叉 + CO₂ 补氧，是否同意？
 2. Ce₂O₃ layer 模型：沿用 Stage 5 比较所用的 Ce₄O₆/Rh(111) p(3×3)（层上只有一个 Ce 平面）；实验描述为“双层 Ce₂O₃”，是否需要另建两个 Ce 平面的 Ce₈O₁₂/Rh(111) 双层模型？
-3. 范德华修正：CH₄ 物理吸附与参考文献均用 DFT-D3；当前项目合同无 IVDW。是否在 Stage 6 全体系统一加 D3（`build_stage6.py --d3`）？
+3. ~~范德华修正~~ **已定（用户 2026-10-13）：不加 D3**，沿用项目合同（无 IVDW），`build_stage6.py` 不带 `--d3`。
 4. Layer 上 R4b 使用 Ce₂O₃ 晶格 O（产生 O_v，再由 CO₂ 在 R8 补回），按参考文献的 MvK 循环处理，是否同意？
 5. Layer 边界位：Ce₄O₆/Rh(111) p(3×3) 把 Rh 完全盖住，CH₄ 只能在 Ce/O_s 上活化；文献中“金属/Ce₂O₃”低能垒（Co/Ce₂O₃ 0.05 eV、Ni/CeO₂₋ₓ 0.15 eV）都出现在金属–氧化物界面。
    是否加一个 layer 条带模型（Ce₂O₃ 条带 + 一排裸露 Rh，即 layer 的 Rh–Ce₂O₃ 边界）作为模型 C′，与 cluster 周边位（B）对等比较？
@@ -161,3 +161,5 @@ CI-NEB（VTST 已编译进 `vasp_632_vtst_solpp_beef_std`）：5–7 个 image�
 - **INCAR 修正：**MAXMIX 40 只留在 stage A 单点；Stage-5 C4a 在弛豫中跨离子步保留混合历史导致 BRMIX 发散（2026-10-06），B/C 段不再写。
 - **Windows 行尾：**生成脚本统一写 LF（CRLF 的 job.pbs 会被 bash 拒绝），MANIFEST 按 LF 内容计算。
 - Vanda 上仍有一个 Stage-3 遗留的挂起作业 1403405（sp_S1_11a，状态 H），与 Stage 6 无关。
+- **850 °C + CO₂ 单独作图（2026-10-13）：**`../analysis_20261013/Fig_muO_850C_CO2_only.{png,svg}`（脚本同名 .py）。不再标 CO₂/CO = 1；
+  1 bar 纯 CO₂ 平衡 Δμ_O = −1.92 eV（10⁻⁴ bar 为 −2.22 eV）。该线处：团簇 Ce₂O₄→Ce₂O₃ ΔG = +0.27 eV/Ce（保持 Ce₂O₄），层 Ce₄O₈→Ce₄O₆ ΔG = −0.07 eV/Ce（还原为 Ce₂O₃）。
