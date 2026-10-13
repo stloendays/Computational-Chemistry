@@ -20,7 +20,7 @@
 | Structure–activity inference | Experimental correlation makes Ce₂O₃ bilayer/Rh a compelling mechanistic **hypothesis**. | It does not establish that layer has lower CH₄ activation barrier; compute barriers on matched active sites, including edge/defect/exposed-Rh controls. |
 | CO₂ effect | CO₂ can participate in oxygen-vacancy replenishment and change the restructuring kinetics and electronic state. | A higher oxygen chemical potential generally stabilizes more oxygen-rich stoichiometries; it does **not automatically favor reduced Ce₂O₃ over CeO₂**. The structural explanation remains open. |
 
-Reference literature for methane-activation workflow: Hui Wang *et al.*, *Nature Communications* **15**, 3765 (2024), https://doi.org/10.1038/s41467-024-48122-6, studies **Ir/CeO₂₋ₓ**, not Rh/Ce₂O₃; transferable *methodological precedent*, not direct proof. Their CI-NEB analysis includes CH₄ → CH₃*+H*, CH₃* → CH₂*+H*, and competition with CH₂* oxidation by oxide oxygen.
+Potential methodology reference (verify the precise model and paths before citing in a manuscript): https://doi.org/10.1038/s41467-024-48122-6. Treat as methodological inspiration, not direct evidence for Rh/Ce₂O₃.
 
 ## 3. Checkable completed DFT results: Stage 5 (finished 2026-10-08)
 
@@ -69,9 +69,6 @@ layer reduced/oxidised crossover:   −1.771 eV/O, log10(CO2/CO)=6.30
 An alternative O₂ reservoir is `μ_O=½ μ_O2(T,p_O2)`, but pure CO₂ feed does not fix `p_O2` either. If a carbon reservoir is adopted, that is yet another independently justified assumption.
 
 Thresholds are **within a fixed morphology** (Ce₂O₃ vs Ce₂O₄ cluster, Ce₄O₆ vs Ce₄O₈ layer), **not a cluster-vs-layer stability crossing**. Stage-5 boundaries −2.453 and −1.771 eV must not be confused with old round-1 layer 20a-vs-30a −0.951 eV (different geometries, references and calculation stages). The ~850 °C grand-potential mapping neglects several condensed-phase thermal terms (vibrations/configurational entropy) and is therefore a first approximation.
-
-![850 °C oxygen potential schematic](./Fig_muO_850C_CO2.svg)
-![Interaction-energy plot](./Fig_Eint_cluster_layer.svg)
 
 Legacy ready-made figures, already on GitHub: [Fig_cluster_vs_layer_Eint.png](../stage2_interfaces_20260910/results/cluster_layer_Eint_20260930/Fig_cluster_vs_layer_Eint.png) and [Fig_dG_cluster_vs_layer.png](../stage2_interfaces_20260910/results/cluster_layer_Eint_20260930/Fig_dG_cluster_vs_layer.png).
 
