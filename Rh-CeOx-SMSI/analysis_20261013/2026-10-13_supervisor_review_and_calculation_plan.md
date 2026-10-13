@@ -68,6 +68,23 @@ layer reduced/oxidised crossover:   −1.771 eV/O, log10(CO2/CO)=6.30
 
 An alternative O₂ reservoir is `μ_O=½ μ_O2(T,p_O2)`, but pure CO₂ feed does not fix `p_O2` either. If a carbon reservoir is adopted, that is yet another independently justified assumption.
 
+### Proposed Method B: CO₂-only feed represented by gas dissociation equilibrium (approved working assumption, not yet evaluated)
+
+**Modeling choice (2026-10-13):** To answer the supervisor's question about the position of the **850 °C + CO₂** marker even when experimental CO partial pressure is unavailable, use the ideal-gas **CO₂ dissociation equilibrium** as a *first-pass estimated reservoir*:
+
+```text
+CO2(g) ⇌ CO(g) + 1/2 O2(g)
+Kp(T) = [(pCO/p°) (pO2/p°)^(1/2)] / (pCO2/p°)
+Kp(T) = exp[-ΔrG°(T)/(R T)]
+μO(eq) = μCO2 − μCO = 1/2 μO2
+```
+
+**Practical 850 °C implementation:** set `T=1123.15 K`; specify **measured total gas pressure** `P` (and initial CO₂/He composition if the microscope gas cell uses a carrier). For a simple 1 mol *pure CO₂* starting state, define equilibrium dissociation extent `ξ`: `nCO2=1−ξ`, `nCO=ξ`, `nO2=ξ/2`, `ntot=1+ξ/2`; use `p_i=P n_i/ntot`, solve the dimensionless `Kp` equation, and calculate `μO` with gas thermochemistry from the same reference convention as the existing Stage-5 `ΔμO` plot. For inert dilution, include `nHe` in `ntot`. Document the source of `ΔrG°(1123.15 K)` (e.g. NIST-JANAF), standard pressure and reference zero.
+
+**Figure deliverable:** plot a vertical line titled **“850 °C + CO₂: ideal-gas dissociation-equilibrium estimate (assumed P and feed)”**; if P/He fraction are not yet confirmed, plot a parametric/sensitivity range rather than an unqualified fixed number. Keep the old **CO₂/CO = 1:1, ΔμO = −3.176 eV** point as a separate *illustrative reference*, not an experimental identification. Compare both results to the Stage-5 fixed-morphology boundaries (cluster −2.453 eV, layer −1.771 eV).
+
+**Interpretation:** this calculation estimates a **gas-equilibrium limit**; it does not assert that the actual flowing, heated, illuminated catalytic gas cell reaches full CO₂ dissociation equilibrium, nor that the model captures the local oxygen reservoir exactly. Use the experimental conditions and, when available, measured outlet or local gas composition to cross-check. **This is an approved planned calculation, not an already-computed μO value or a completed DFT run.**
+
 Thresholds are **within a fixed morphology** (Ce₂O₃ vs Ce₂O₄ cluster, Ce₄O₆ vs Ce₄O₈ layer), **not a cluster-vs-layer stability crossing**. Stage-5 boundaries −2.453 and −1.771 eV must not be confused with old round-1 layer 20a-vs-30a −0.951 eV (different geometries, references and calculation stages). The ~850 °C grand-potential mapping neglects several condensed-phase thermal terms (vibrations/configurational entropy) and is therefore a first approximation.
 
 Legacy ready-made figures, already on GitHub: [Fig_cluster_vs_layer_Eint.png](../stage2_interfaces_20260910/results/cluster_layer_Eint_20260930/Fig_cluster_vs_layer_Eint.png) and [Fig_dG_cluster_vs_layer.png](../stage2_interfaces_20260910/results/cluster_layer_Eint_20260930/Fig_dG_cluster_vs_layer.png).
