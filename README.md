@@ -7,6 +7,8 @@ Large binaries (POTCAR, WAVECAR, CHGCAR, OUTCAR) are never committed; the licens
   - `stage1_bulk_references_20260821/` — Rh, Ce2O3 bulk references.
   - `stage2_interfaces_20260910/` — CeOx/Rh(111) interface thermodynamics, round 1 (contract, inputs, submission log).
   - `stage3_units_CH4_20260924/` — one CeO2 unit / one Ce2O3 cluster on Rh(111) 4x4 (step 1, interaction energies), then CH4 -> CH3 -> CH2 (step 2); ENCUT 450, ISPIN 2, z = 0.
+  - `analysis_20261013/` — 2026-10-13 supervisor review, μO at 850 °C (incl. CO₂ ⇌ CO + ½O₂ equilibrium estimate), E_int figures.
+  - `stage6_DRM_CH4_paths_20261013/` — DRM CH₄ conversion pathways on Rh(111), Ce₂O₃ cluster/Rh(111), Ce₂O₃ layer/Rh(111): plan + Phase-1 preview inputs (not submitted).
 
 
 ## Rh-CeOx-SMSI binding scientific rules

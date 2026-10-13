@@ -1,0 +1,27 @@
+PREVIEW (layer parent = round-1 30a; rebuild with --layer S1_31 CONTCAR before submission)
+no IVDW
+A0_ref                     Rh64               c=25.109  zmax=6.543  vac=18.57  min(ads)=nan None
+A1_CH4_top                 CH4Rh64            c=25.109  zmax=10.109  vac=15.00  min(ads)=1.80 ('H', 'H')
+A2_CH3top_Hfcc             CH4Rh64            c=25.109  zmax=8.973  vac=16.14  min(ads)=1.70 ('H', 'H')
+A3_CH2fcc_2Hfcc            CH4Rh64            c=25.109  zmax=8.713  vac=16.40  min(ads)=1.83 ('H', 'Rh')
+B0_ref                     Ce2O3Rh64          c=28.214  zmax=10.933  vac=17.28  min(ads)=nan None
+B1_CH4_perimRh             CH4Ce2O3Rh64       c=28.214  zmax=10.933  vac=17.28  min(ads)=1.80 ('H', 'H')
+B2_CH4_Ce                  CH4Ce2O3Rh64       c=28.214  zmax=13.214  vac=15.00  min(ads)=1.79 ('H', 'O')
+B3_CH3perimRh_HOt          CH4Ce2O3Rh64       c=28.214  zmax=11.913  vac=16.30  min(ads)=1.68 ('H', 'O')
+B4_CH3perimRh_Hfcc         CH4Ce2O3Rh64       c=28.214  zmax=10.933  vac=17.28  min(ads)=1.68 ('H', 'O')
+B5_CH3Ce_HOt               CH4Ce2O3Rh64       c=28.214  zmax=11.913  vac=16.30  min(ads)=1.78 ('H', 'H')
+B6_CH3farRh_Hfcc           CH4Ce2O3Rh64       c=28.214  zmax=10.933  vac=17.28  min(ads)=1.68 ('H', 'H')
+B7_CH2perimfcc_HOt_Hfcc    CH4Ce2O3Rh64       c=28.214  zmax=11.913  vac=16.30  min(ads)=1.83 ('H', 'Rh')
+B8_CH2perimfcc_2Hfcc       CH4Ce2O3Rh64       c=28.214  zmax=10.933  vac=17.28  min(ads)=1.81 ('H', 'Rh')
+C0_ref                     Ce4O6Rh36          c=28.629  zmax=10.362  vac=18.27  min(ads)=nan None
+C1_CH4_Ce                  CH4Ce4O6Rh36       c=28.629  zmax=13.454  vac=15.18  min(ads)=1.80 ('H', 'H')
+C2_CH4_Os                  CH4Ce4O6Rh36       c=28.629  zmax=13.629  vac=15.00  min(ads)=1.80 ('H', 'H')
+C3_CH3Ce_HOs               CH4Ce4O6Rh36       c=28.629  zmax=12.607  vac=16.02  min(ads)=1.78 ('H', 'H')
+C4_CH3Os_HOs               CH4Ce4O6Rh36       c=28.629  zmax=12.162  vac=16.47  min(ads)=1.43 ('C', 'O')
+C5_CH2Ce_2HOs              CH4Ce4O6Rh36       c=28.629  zmax=12.607  vac=16.02  min(ads)=1.86 ('H', 'H')
+C6_CH2Os_2HOs              CH4Ce4O6Rh36       c=28.629  zmax=12.402  vac=16.23  min(ads)=1.42 ('C', 'O')
+G_CH4                      CH4
+G_H2                       H2
+G_CO                       CO
+G_CO2                      CO2
+G_H2O                      H2O
