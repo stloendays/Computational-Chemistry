@@ -1,6 +1,6 @@
 # 2026-10-15 | Supervisor-updated plan: first CH₄ C–H cleavage on FOUR structures + dual 850 °C SMSI markers
 
-**Decision source:** User relayed the supervisor's latest instruction on 2026-10-15, together with an experimental-summary slide. This plan **supersedes** the older three-model / CH₄→CH₃→CH₂ / full-DRM suggestions for the **current round**. These are **to-do calculations**, NOT newly completed VASP results. Suggested week: 2026-10-15 to 2026-10-18 (SGT).
+**Decision source:** User relayed the supervisor's latest instructions on 2026-10-15, including the experimental-summary slide and the explicit **standard NEB first; CI-NEB only after path confirmation** computational sequencing. This plan **supersedes** the older three-model / CH₄→CH₃→CH₂ / full-DRM suggestions for the **current round**. These are **to-do calculations**, NOT newly completed VASP results. Suggested week: 2026-10-15 to 2026-10-18 (SGT).
 
 ## 1. Experiment constraints to use in the slides and plot
 
@@ -32,10 +32,31 @@ These temperatures and both 850 °C plot markers follow the supervisor's new sum
 1. Reuse / revalidate four clean parents (A–C: verify existing CONTCAR and settings; D: newly optimize Ce₂O₃ cluster/CeO₂ and a clean CeO₂ control).
 2. Generate several physically accessible CH₄ adsorption starts; relax CH₄* (IS) and dissociated CH₃* + H*/OH* (FS), without forcing a reaction at inaccessible buried Rh sites. Screen alternatives with **matched model-specific energy references**.
 3. Report first-step reaction energy `ΔE = E(FS) − E(IS)` and CH₄ adsorption energy `E_ads = E(CH₄*) − E(clean parent) − E(CH₄,g)`.
-4. After stable, composition-matched endpoints exist, run **one best-first-path CI-NEB per model** (up to 4 initial paths; extra only if end-state ranking demands); report `E_a = E(TS) − E(IS)`; verify the saddle by its unstable mode and ideally one imaginary frequency.
-5. Compare the **first-cleavage** barriers and accessible sites across A–D. The fourth model answers whether oxide-supported CeOₓ clusters have a different CH₄-activation mechanism than clusters on Rh. Do **not** compare bare raw TOTEN across different supercells/compositions.
+4. After stable, composition-matched endpoints exist, run **regular NEB first (`LCLIMB = .FALSE.`)** for each best-first-cleavage candidate (up to four initial paths, one per model where a viable IS/FS pair exists); use it to screen the pathway and estimate the highest-energy region. **Do not turn on climbing image while the path or endpoints are still unresolved.**
+5. Inspect the converged ordinary-NEB energy profile, image continuity, atom motion, spin/geometry and highest-energy image. Revise an unphysical/discontinuous path or incorrect endpoints before proceeding; the highest ordinary-NEB image is only an **approximate** barrier/TS candidate.
+6. **Only for credible, adequately converged NEB pathways**, continue from the optimized images into **CI-NEB (`LCLIMB = .TRUE.`)** to refine the saddle point and report `E_a = E(TS) − E(IS)`; verify the reaction mode (ideally exactly one imaginary frequency). CI-NEB is a **second-stage refinement**, not the starting job for all four systems.
+7. Compare the **first-cleavage** screening profiles and, where CI refinement is actually finished, validated barriers and accessible sites across A–D. The fourth model answers whether oxide-supported CeOₓ clusters have a different CH₄-activation mechanism than clusters on Rh. Do **not** compare bare raw TOTEN across different supercells/compositions.
 
 **Excluded from this week's authorized scope:** CH₃→CH₂, complete CH₄→C, CO₂ dissociation, CHₓ oxidation, MvK closed cycle, a new large bilayer NEB campaign, microkinetics. The older Stage-6 files exploring these steps stay archived as *future candidates*, not active tasks.
+
+### 3.1 Supervisor instruction: ordinary NEB → check → CI-NEB (2026-10-15)
+
+**Why this order:** ordinary NEB (nudged elastic band) maps an approximate minimum-energy path between relaxed IS and FS, while climbing-image NEB deliberately drives the highest-energy image toward a first-order saddle. On poorly guessed initial paths, activating climb immediately can increase convergence trouble and repeated wasted calculations. CI-NEB is not intrinsically always slower; the practical efficiency comes from **screening first and refining selectively**.
+
+**Phase NEB-1 — Path discovery / screening (the next queued kinetic job):**
+- First fully relax the IS and FS under the same parent slab and DFT settings, with atom count conserved and a physically possible H transfer.
+- Interpolate ~5–7 intermediate images as appropriate, start ordinary NEB with `LCLIMB = .FALSE.` (existing VTST executable); preserve a run-specific copy of all IS/FS/intermediate structures.
+- Inspect image ordering, smoothness of the energy profile, large discontinuous atom jumps, Ce/O reconstruction, max forces, and whether the images actually describe the same first CH₄ C–H cleavage.
+- Record `E_a^(NEB,screen) ≈ max_i E_i − E_IS` only as a **discrete-image estimate**, not as a confirmed saddle point.
+
+**Review gate before advancing:** IS and FS are independently stable; NEB profile is continuous and chemically sensible; images are sufficiently converged for screening; the high-energy region is identified. If not, repair endpoints/interpolation or test another adsorption site and **do not start CI-NEB yet**.
+
+**Phase NEB-2 — Targeted CI-NEB refinement (after the review gate only):**
+- Copy/back up the ordinary-NEB outputs; propagate relaxed intermediate geometries into the continuation inputs using the relevant `CONTCAR → POSCAR` workflow. Switch `LCLIMB = .TRUE.` and tighten ionic-force convergence as resources permit; **do not discard the verified path and restart climbing blindly**.
+- Validate the selected climbing-image saddle through one imaginary mode along C–H rupture/H migration where practical; if the mode is wrong, revise the pathway.
+- Tag tables clearly as `ordinary-NEB estimate` vs `CI-NEB refined` vs `TS validated`; **never label an unfinished NEB profile as a converged CI-NEB barrier**.
+
+**Resource-management rule:** use the same two-stage sequencing on models A/B/C/D. Do not launch CI-NEB for all four automatically; only refine their physically viable candidate pathways once ordinary NEB is checked. Older Stage-6 documentation and scripts that mention direct CI-NEB are historical; this instruction takes priority this round.
 
 ### Calculation quality rules
 
@@ -68,18 +89,18 @@ Scientific distinction: the two 850 °C marker comparison is primarily **Ce₂O�
 
 ### Sat 17 Oct — screen endpoints, start first-step kinetics
 - [ ] Review relaxed IS/FS energies, Fmax, moment and atom balance; reject physically implausible forced states.
-- [ ] Start the lowest viable CH₄ first-cleavage CI-NEB on A/B/C and D when its reference is ready; resource-constrained runs may carry into next week.
+- [ ] Start **ordinary NEB (`LCLIMB=.FALSE.`)** for the lowest viable CH₄ first-cleavage IS/FS pairs on A/B/C, and D once its clean parent/IS/FS are ready; review energy profiles and images before queuing any CI-NEB. Convergence/refinement may carry into next week.
 
 ### Sun 18 Oct — report and handoff
 - [ ] Submit one overlay plot with BOTH 850 °C experimental annotations, source data and caption.
-- [ ] Report A–D structure gallery, status table, ΔE and available E_a, convergence and missing work. A pending NEB must be called **running/queued**, not **finished**.
+- [ ] Report A–D structure gallery, status table, ΔE, available **ordinary-NEB screening estimates**, and any **CI-NEB refined/TS-verified** E_a separately; include path-review findings, convergence and missing work. A pending NEB must be called **running/queued**, not **finished**.
 - [ ] Note potential next-stage CH₃→CH₂/CO₂/O-vacancy branches under a **deferred** heading only; do not launch without next supervisor instruction.
 
 ## 6. Acceptance criteria
 
 - [ ] **Four** chemically identified parent structures with provenance; D actually built, not merely relabeled.
 - [ ] First-cleavage IS/FS attempted on **all four** structures; converged if feasible, with missing/unstable sites clearly recorded.
-- [ ] Four first-step CI-NEB pathways attempted once viable endpoints exist; completed barriers only for truly converged paths.
+- [ ] Up to four first-step **ordinary NEB** pathways attempted when viable IS/FS exist; document their screening energy profiles and check the high-energy images. **CI-NEB is deferred until the ordinary-NEB path passes the review gate**; refine only selected paths, with final barriers reported only once truly converged.
 - [ ] **One** properly captioned Ce₂O₃ layer/cluster stability figure containing the **two 850 °C gas conditions**.
 - [ ] A concise comparison of what is an experimental observation, a DFT result, and a hypothesis.
 
