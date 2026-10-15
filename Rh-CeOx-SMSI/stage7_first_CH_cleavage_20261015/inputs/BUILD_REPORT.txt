@@ -1,0 +1,5 @@
+A/B/C copied from Stage-6 inputs (B<->C relabelled); D support = parents/CONTCAR_CeO2_111_p4x4_3TL
+D0_CeO2_111            Ce48O96    c=27.389 zmax=7.897 vac=19.49 fixed=48 min(cluster)=nan
+D1_Ce2O3_hO_2Odown     Ce50O99    c=27.389 zmax=10.897 vac=16.49 fixed=48 min(cluster)=2.03
+D2_Ce2O3_hO_1Odown     Ce50O99    c=27.389 zmax=10.797 vac=16.59 fixed=48 min(cluster)=2.09
+D3_Ce2O3_gasgeom       Ce50O99    c=27.389 zmax=12.389 vac=15.00 fixed=48 min(cluster)=1.93
