@@ -1,5 +1,13 @@
-A/B/C copied from Stage-6 inputs (B<->C relabelled); D support = parents/CONTCAR_CeO2_111_p4x4_3TL
-D0_CeO2_111            Ce48O96    c=27.389 zmax=7.897 vac=19.49 fixed=48 min(cluster)=nan
-D1_Ce2O3_hO_2Odown     Ce50O99    c=27.389 zmax=10.897 vac=16.49 fixed=48 min(cluster)=2.03
-D2_Ce2O3_hO_1Odown     Ce50O99    c=27.389 zmax=10.797 vac=16.59 fixed=48 min(cluster)=2.09
-D3_Ce2O3_gasgeom       Ce50O99    c=27.389 zmax=12.389 vac=15.00 fixed=48 min(cluster)=1.93
+A/B/C copied from Stage-6 inputs (B<->C relabelled), adsorbate contacts tidied; D support = parents/CONTCAR_CeO2_111_p4x4_3TL
+B3_CH3Ce_HOs           tidy ok=True minH-X=2.30 minC-X=2.55
+B4_CH3Os_HOs           tidy ok=False minH-X=2.07 minC-X=1.43
+C1_CH4_perimRh         tidy ok=True minH-X=2.35 minC-X=3.24
+C2_CH4_Ce              tidy ok=True minH-X=2.34 minC-X=3.24
+C3_CH3perimRh_HOt      tidy ok=False minH-X=2.06 minC-X=2.06
+C4_CH3perimRh_Hfcc     tidy ok=False minH-X=1.93 minC-X=2.06
+C5_CH3Ce_HOt           tidy ok=True minH-X=2.74 minC-X=2.55
+C6_CH3farRh_Hfcc       tidy ok=False minH-X=2.00 minC-X=2.06
+D0_CeO2_111            Ce48O96    c=26.817 zmax=7.897 vac=18.92 fixed=48 min(cluster)=nan
+D1_Ce2O3_hO_2Odown     Ce50O99    c=26.817 zmax=10.897 vac=15.92 fixed=48 min(cluster)=2.00
+D2_Ce2O3_hO_1Odown     Ce50O99    c=26.817 zmax=10.797 vac=16.02 fixed=48 min(cluster)=2.09
+D3_Ce2O3_gasgeom       Ce50O99    c=26.817 zmax=11.817 vac=15.00 fixed=48 min(cluster)=1.93
