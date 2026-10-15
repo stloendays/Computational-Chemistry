@@ -1,5 +1,7 @@
 # Stage 6 — DRM 中 CH₄ 转化反应路径：Rh(111) / Ce₂O₃ cluster/Rh(111) / Ce₂O₃ layer/Rh(111)
 
+> **2026-10-15 教师最新修订（本轮执行优先；本文件其余内容为 10-13 历史规划）：** 当前只做 **CH₄ 第一条 C–H 键断裂**，比较 **四个模型**：Rh(111)、Ce₂O₃ layer/Rh(111)、Ce₂O₃ cluster/Rh(111) 和 **Ce₂O₃ cluster/CeO₂ support**（第四模型新建，CeO₂(111) 优先候选）。本轮还需在同一稳定性图上标记 **850°C + CO₂** 与 **850°C + CH₄:CO₂=1:1**。计算步骤必须为 **初末态优化 → 普通 NEB（`LCLIMB=.FALSE.`）→ 检查路径/收敛 → 仅对确认合理的路径进行 CI-NEB（`LCLIMB=.TRUE.`）精修/TS 验证**。**不要直接将本页旧 CI-NEB 计划作为本轮提交指令**；后续 CH₃→CH₂、CO₂ 活化和全 DRM 路径暂缓。完整 [2026-10-15 任务计划](https://github.com/stloendays/Computational-Chemistry/blob/main/Rh-CeOx-SMSI/weekly_plans/2026-10-15_first_CH4_cleavage_four_models_and_850C_atmospheres.md)（记录导师明确提出“先 NEB、后 CI-NEB”，节省失败路径上的计算成本）。
+
 创建：2026-10-13。状态：**路径方案 + Phase-1 提交版输入已准备（layer = Stage-4 L6）；尚未提交任何计算**。按老师要求，先确定路径并与 Dr. Xiaoyan Li 更新，确认后再上 Vanda 提交。
 
 ## 1. 任务来源（导师 2026-10-13 笔记，作为验收标准）
