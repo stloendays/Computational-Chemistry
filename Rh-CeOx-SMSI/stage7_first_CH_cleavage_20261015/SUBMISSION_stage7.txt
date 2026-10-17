@@ -20,3 +20,7 @@ D1_Ce2O3_hO_2Odown 1460294
 D2_Ce2O3_hO_1Odown 1460295
 D3_Ce2O3_gasgeom 1460296
 G_CH4 1460297
+D1_Ce2O3_hO_2Odown 1463484 gamma relax + 2x2x1 SP (2026-10-17)
+D2_Ce2O3_hO_1Odown 1463485 gamma relax + 2x2x1 SP (2026-10-17)
+D3_Ce2O3_gasgeom 1463486 gamma relax + 2x2x1 SP (2026-10-17)
+B0..C6 stage-A resumes from WAVECAR: 1463445-1463455 (2026-10-17)
