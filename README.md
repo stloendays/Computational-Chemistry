@@ -9,6 +9,7 @@ Large binaries (POTCAR, WAVECAR, CHGCAR, OUTCAR) are never committed; the licens
   - `stage3_units_CH4_20260924/` — one CeO2 unit / one Ce2O3 cluster on Rh(111) 4x4 (step 1, interaction energies), then CH4 -> CH3 -> CH2 (step 2); ENCUT 450, ISPIN 2, z = 0.
   - `analysis_20261013/` — 2026-10-13 supervisor review, μO at 850 °C (incl. CO₂ ⇌ CO + ½O₂ equilibrium estimate), E_int figures.
   - `stage6_DRM_CH4_paths_20261013/` — DRM CH₄ conversion pathways on Rh(111), Ce₂O₃ cluster/Rh(111), Ce₂O₃ layer/Rh(111): plan + Phase-1 preview inputs (not submitted).
+  - `stage7_first_CH_cleavage_20261015/` — first CH₄ C–H cleavage on Rh(111), Ce₄O₆ layer/Rh, Ce₂O₃ cluster/Rh and Ce₂O₃ cluster/CeO₂(111): endpoint energies, relaxed structures, ordinary-NEB inputs (two-step stage A → NEB for Ce paths) and status.
 
 
 ## Rh-CeOx-SMSI binding scientific rules

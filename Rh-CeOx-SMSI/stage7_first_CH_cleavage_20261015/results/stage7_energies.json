@@ -1,0 +1,110 @@
+{
+ "E_CH4_gas": -24.03718833,
+ "E0": {
+  "A0_ref": -439.67924156,
+  "A1_CH4_top": -463.72517165,
+  "A2_CH3top_Hfcc": -463.46446031,
+  "B0_ref": -329.38082496,
+  "B1_CH4_Ce": -353.42862844,
+  "B3_CH3Ce_HOs": -352.14423626,
+  "B4_CH3Os_HOs": -353.08486563,
+  "C0_ref": -478.36917917,
+  "C5_CH3Ce_HOt": -501.71977962,
+  "D0_CeO2_111": -1150.42896919,
+  "B2_CH4_Os": -353.45327625,
+  "C1_CH4_perimRh": -502.51121459,
+  "C2_CH4_Ce": -502.45380937,
+  "C6_CH3farRh_Hfcc": -502.10369653,
+  "C3_CH3perimRh_HOt": -502.74637751,
+  "C4_CH3perimRh_Hfcc": -502.03733345
+ },
+ "models": {
+  "A": {
+   "name": "Rh(111)",
+   "clean": "A0_ref",
+   "IS": [
+    "A1_CH4_top"
+   ],
+   "FS": [
+    "A2_CH3top_Hfcc"
+   ],
+   "E_rel": {
+    "A1_CH4_top": -0.009,
+    "A2_CH3top_Hfcc": 0.252
+   },
+   "best_IS": "A1_CH4_top",
+   "E_ads": -0.009,
+   "dE": {
+    "A2_CH3top_Hfcc": 0.261
+   },
+   "IS_complete": true
+  },
+  "B": {
+   "name": "Ce4O6 layer/Rh(111)",
+   "clean": "B0_ref",
+   "IS": [
+    "B1_CH4_Ce",
+    "B2_CH4_Os"
+   ],
+   "FS": [
+    "B3_CH3Ce_HOs",
+    "B4_CH3Os_HOs"
+   ],
+   "E_rel": {
+    "B1_CH4_Ce": -0.011,
+    "B2_CH4_Os": -0.035,
+    "B3_CH3Ce_HOs": 1.274,
+    "B4_CH3Os_HOs": 0.333
+   },
+   "best_IS": "B2_CH4_Os",
+   "E_ads": -0.035,
+   "dE": {
+    "B3_CH3Ce_HOs": 1.309,
+    "B4_CH3Os_HOs": 0.368
+   },
+   "IS_complete": true
+  },
+  "C": {
+   "name": "Ce2O3 cluster/Rh(111)",
+   "clean": "C0_ref",
+   "IS": [
+    "C1_CH4_perimRh",
+    "C2_CH4_Ce"
+   ],
+   "FS": [
+    "C3_CH3perimRh_HOt",
+    "C4_CH3perimRh_Hfcc",
+    "C5_CH3Ce_HOt",
+    "C6_CH3farRh_Hfcc"
+   ],
+   "E_rel": {
+    "C1_CH4_perimRh": -0.105,
+    "C2_CH4_Ce": -0.047,
+    "C3_CH3perimRh_HOt": -0.34,
+    "C4_CH3perimRh_Hfcc": 0.369,
+    "C5_CH3Ce_HOt": 0.687,
+    "C6_CH3farRh_Hfcc": 0.303
+   },
+   "best_IS": "C1_CH4_perimRh",
+   "E_ads": -0.105,
+   "dE": {
+    "C3_CH3perimRh_HOt": -0.235,
+    "C4_CH3perimRh_Hfcc": 0.474,
+    "C5_CH3Ce_HOt": 0.792,
+    "C6_CH3farRh_Hfcc": 0.408
+   },
+   "IS_complete": true
+  },
+  "D": {
+   "name": "Ce2O3 cluster/CeO2(111)",
+   "clean": null,
+   "IS": [],
+   "FS": [],
+   "E_rel": {},
+   "best_IS": null,
+   "E_ads": null,
+   "dE": {},
+   "IS_complete": false
+  }
+ }
+}

@@ -20,7 +20,14 @@ D1_Ce2O3_hO_2Odown 1460294
 D2_Ce2O3_hO_1Odown 1460295
 D3_Ce2O3_gasgeom 1460296
 G_CH4 1460297
-D1_Ce2O3_hO_2Odown 1463484 gamma relax + 2x2x1 SP (2026-10-17)
-D2_Ce2O3_hO_1Odown 1463485 gamma relax + 2x2x1 SP (2026-10-17)
-D3_Ce2O3_gasgeom 1463486 gamma relax + 2x2x1 SP (2026-10-17)
-B0..C6 stage-A resumes from WAVECAR: 1463445-1463455 (2026-10-17)
+A_neb 1493916.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261026
+B_neb 1493917.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261026
+C_neb 1493918.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261026
+C_neb 1493938.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261026_resubmit_after_system_hold_1493918
+A_neb 1493946.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261026_restart_ISTART0_after_NBANDS_mismatch_1493916
+B_neb 1496320.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261026_restart_ISTART0_after_wavecar_start_failed
+C_neb 1496321.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261026_restart_ISTART0_after_wavecar_start_failed
+B_neb 1497146.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261027_MAGMOM_Ce1_user_approved
+C_neb 1497147.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261027_MAGMOM_Ce1_user_approved
+B_neb 1497610.stdct-mgmt-02 ordinary_NEB_two_step_stageA_images_then_NEB_MAGMOM_Ce1_20261027
+C_neb 1497611.stdct-mgmt-02 ordinary_NEB_two_step_stageA_images_then_NEB_MAGMOM_Ce1_20261027

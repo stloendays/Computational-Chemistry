@@ -1,0 +1,3 @@
+A A1_CH4_top -> A2_CH3top_Hfcc: 69 atoms, 32 fixed; largest moves H65 2.22 A, H68 1.68 A, C64 1.46 A; shortest pair in images 1.08 A
+B B2_CH4_Os -> B4_CH3Os_HOs: 51 atoms, 18 fixed; largest moves H49 4.26 A, H48 2.24 A, C46 2.17 A; shortest pair in images 1.05 A
+C C1_CH4_perimRh -> C3_CH3perimRh_HOt: 74 atoms, 32 fixed; largest moves H71 2.88 A, H73 2.24 A, C69 2.01 A; shortest pair in images 1.05 A

@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+#PBS -N s7neb_C_C1C3
+#PBS -P CFP04-CF-046
+#PBS -l select=2:ncpus=36:mpiprocs=36:ompthreads=1:mem=250gb
+#PBS -l walltime=72:00:00
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+for f in INCAR_stageA_images INCAR_neb KPOINTS POTCAR 00/POSCAR 00/OUTCAR 07/POSCAR 07/OUTCAR; do
+  test -s "$f" || { echo "Missing or empty $f" >&2; exit 2; }
+done
+module purge
+module load intel/2021b
+export OMP_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+VASP_BIN=/nfs/home/svu/junbotong/software/vasp/NUS_HPC_VASP/vasp_632_vtst_solpp_beef_std
+test -x "$VASP_BIN" || { echo "VASP executable not found: $VASP_BIN" >&2; exit 2; }
+NP=$(wc -l < "$PBS_NODEFILE")
+echo "job_id=$PBS_JOBID host=$(hostname) ranks=$NP workdir=$PBS_O_WORKDIR start=$(date --iso-8601=seconds)"
+START=$(date +%s)
+IMGS="$(seq -f %02g 1 6)"
+run_vasp () {
+  local tag=$1 stop=$2 out=$3
+  cp "INCAR_$tag" INCAR
+  rm -f STOPCAR
+  echo "stage=$tag start=$(date --iso-8601=seconds)"
+  mpirun -np "$NP" "$VASP_BIN" > "$out" &
+  local VP=$!
+  ( while kill -0 "$VP" 2>/dev/null; do
+      if [ $(( $(date +%s) - START )) -ge 250200 ]; then printf '%s = .TRUE.\n' "$stop" > STOPCAR; echo watchdog_stop; break; fi
+      sleep 60; done ) &
+  local WD=$!
+  set +e; wait "$VP"; local RC=$?; set -e
+  kill "$WD" 2>/dev/null || true; wait "$WD" 2>/dev/null || true
+  rm -f STOPCAR
+  for k in $IMGS; do cp $k/OSZICAR $k/OSZICAR_$tag; cp $k/OUTCAR $k/OUTCAR_$tag; done
+  echo "stage=$tag end=$(date --iso-8601=seconds) rc=$RC"
+  [ "$RC" -eq 0 ] || exit "$RC"
+}
+imgs_ok () { for k in $IMGS; do grep -q "aborting loop because EDIFF is reached" $k/OUTCAR || return 1; done; }
+if [ ! -e STAGEA_DONE ]; then
+  if [ -e STAGEA_STARTED ] && [ -s 01/WAVECAR ]; then first=stageA_images_r1; else first=stageA_images; fi
+  touch STAGEA_STARTED
+  run_vasp $first LABORT vasp_neb_stageA.out
+  imgs_ok || run_vasp stageA_images_r1 LABORT vasp_neb_stageA_r1.out
+  imgs_ok || { echo "stage=stageA_images SCF NOT converged"; exit 3; }
+  for k in $IMGS; do printf '%s ' "$k:$(grep 'number of electron' $k/OUTCAR | tail -1 | awk '{print $NF}')"; done; echo
+  touch STAGEA_DONE
+fi
+run_vasp neb LSTOP vasp_neb.out
+python3 neb_profile.py . > neb_profile.txt || true
+echo "end=$(date --iso-8601=seconds) rc=0"
+grep -q "reached required accuracy" 01/OUTCAR && echo "NEB converged" || echo "NEB NOT converged"
