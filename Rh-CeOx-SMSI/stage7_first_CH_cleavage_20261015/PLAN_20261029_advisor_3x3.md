@@ -9,7 +9,7 @@ Source: Notion「14｜下一步路线与当前优先级」, entry 2026-10-29. It
 | A Rh(111) | p(4×4), 64 Rh | **p(3×3), 36 Rh**, 4 layers, bottom 2 fixed |
 | B Ce₄O₆ layer/Rh(111) | p(3×3) | p(3×3), unchanged |
 | C Ce₂O₃ cluster/Rh(111) | p(4×4) | **p(3×3)**, C3a cluster re-relaxed on 36 Rh |
-| D Ce₂O₃ cluster/CeO₂(111) | p(4×4), 3 TL, 149 atoms | **p(2×2), 3 TL, 41 + 5 = 53 atoms** (proposed / preliminary) |
+| D Ce₂O₃ cluster/CeO₂(111) | p(4×4), 3 TL, 149 atoms | **p(2×2), 3 TL, 36 + 5 = 41 atoms** (proposed / preliminary) |
 
 - k-mesh: Γ-centred 4×4×1 for every 3×3 Rh cell, as in B. D p(2×2) also uses 4×4×1, because its lateral size is close.
 - The 4×4 energies of A and C are not compared with the new 3×3 values. They stay in `results/` as history.
@@ -39,8 +39,8 @@ The cluster geometry is D1 relaxed on p(4×4), with a lateral extent of 4.41 Å.
 
 | Cell | Atoms | Cluster–image distance |
 |---|---|---|
-| CeO₂(111) p(2×2) | 53 | 3.67 Å |
-| CeO₂(111) p(3×3) | 113 | 7.42 Å |
+| CeO₂(111) p(2×2) | 41 | 3.67 Å |
+| CeO₂(111) p(3×3) | 86 | 7.42 Å |
 | CeO₂(111) p(4×4), current | 149 | (current runs) |
 | Reference: C cluster on Rh(111) p(3×3) | — | 5.25 Å |
 
