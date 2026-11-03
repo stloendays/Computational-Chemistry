@@ -4,6 +4,33 @@ CH₄* → CH₃* + H*/OH* only. Kinetics: ordinary NEB (`LCLIMB = .FALSE.`) fir
 paths that pass the review. Plan: `../weekly_plans/2026-10-15_first_CH4_cleavage_four_models_and_850C_atmospheres.md`;
 next steps: `PLAN_after_D_parent_20261025.md`. Status as of 2026-10-27.
 
+## Current line: Rh(111) p(3×3) and CeO₂(111) p(2×2) (supervisor, 2026-10-29)
+
+The 2026-10-29 guidance changes the cells and the energy definition (plan: `PLAN_20261029_advisor_3x3.md`).
+
+- **Cells:**
+  - A and C move to Rh(111) p(3×3), as B;
+  - D moves to CeO₂(111) p(2×2) with 3 trilayers. D is proposed / preliminary.
+- **Energy:** E₀ (σ → 0) of the converged relaxation, with no separate final single point. Each system runs stage A (spin pre-convergence), then the relaxation.
+- **Inputs:** `inputs_3x3/`, built by `build_3x3.py`. LDAU is set per species: U = 5 eV on Ce 4f, and no LDAU block without Ce.
+- **Monitor:** `monitor/monitor_stage7.py`. A Windows task runs it every 5 h through `monitor_stage7.ps1`. It writes `results/stage7_3x3_table.md` on Vanda.
+- The 4×4 values below are kept as history and are not compared with the 3×3 values.
+
+Accepted so far (relaxation E₀):
+
+| System | E₀ (eV) | Result |
+|---|---|---|
+| A0 Rh(111) p(3×3) | −247.32369 | — |
+| A1 CH₄* top | −271.37836 | E_ads −0.02 eV |
+| A2 CH₃*(top) + H*(fcc) | −271.11411 | ΔE +0.26 eV |
+| C0 Ce₂O₃/Rh(111) p(3×3) | −285.80999 | 2 Ce³⁺ |
+| D0 CeO₂(111) p(2×2) 3TL | −287.60259 | 0 Ce³⁺ |
+| D3 Ce₂O₃/CeO₂(111) p(2×2), gas-phase geometry | −325.37274 | 2 Ce³⁺ |
+
+- C1–C5 and D1 are relaxing; C7 and C8 are queued (jobs in `SUBMISSION_stage7.txt`).
+- The lower of D1 and D3 becomes the D parent.
+- The B ordinary NEB 1502824 (B2 → B4) stopped after 56 steps without converging, and B is on hold.
+
 | Model | Cell | Ce³⁺ |
 |---|---|---|
 | A | Rh(111) 4×4 | — |

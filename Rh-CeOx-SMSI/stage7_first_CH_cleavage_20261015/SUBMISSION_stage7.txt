@@ -31,3 +31,41 @@ B_neb 1497146.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261027_MAGMOM_Ce1_user_appro
 C_neb 1497147.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261027_MAGMOM_Ce1_user_approved
 B_neb 1497610.stdct-mgmt-02 ordinary_NEB_two_step_stageA_images_then_NEB_MAGMOM_Ce1_20261027
 C_neb 1497611.stdct-mgmt-02 ordinary_NEB_two_step_stageA_images_then_NEB_MAGMOM_Ce1_20261027
+B_neb 1502824.stdct-mgmt-02 stageA_r1_resume_20261028_images04_05_not_converged_after_1497610_exit3 (prior outputs in stageA_r0r1_1497610/)
+C7_CH4_Ot 1506831.stdct-mgmt-02 supplement_20261029_CH4_over_cluster_top_O
+C8_CH3Ot_HOb 1506832.stdct-mgmt-02 supplement_20261029_CH3O_on_Ot_plus_OH_bridging
+D3_Ce2O3_gasgeom 1506857.stdct-mgmt-02 final_SP_r1_ISTART1_from_WAVECAR_after_1494894_watchdog_in_SP (relax r3 converged)
+D2_Ce2O3_hO_1Odown 1506867.stdct-mgmt-02 relax_r4_from_r3_CONTCAR_after_1494893_walltime (user: 继续算 D2, 2026-10-29)
+D4_CH4_Ce 1507327.stdct-mgmt-02 D_endpoint_parent_D3_relaxed_20261029
+D5_CH4_edge 1507330.stdct-mgmt-02 D_endpoint_parent_D3_relaxed_20261029
+D6_CH3Ce_HOc 1507331.stdct-mgmt-02 D_endpoint_parent_D3_relaxed_20261029
+D7_CH3Os_HOc 1507333.stdct-mgmt-02 D_endpoint_parent_D3_relaxed_20261029
+D8_CH3Ce_HOs 1507334.stdct-mgmt-02 D_endpoint_parent_D3_relaxed_20261029
+--- 2026-10-29 supervisor (Notion 14): A/C -> Rh(111) p(3x3), D -> CeO2(111) p(2x2) 3TL, no final SP; inputs_3x3/ (build_3x3.py); 4x4 jobs 1497611 1506831 1506832 1506857 1506867 1507330-334 cancelled (user)
+3x3/A0_ref 1507563.stdct-mgmt-02 two_stage_A_relax_20261029
+3x3/A1_CH4_top 1507564.stdct-mgmt-02 two_stage_A_relax_20261029
+3x3/A2_CH3top_Hfcc 1507565.stdct-mgmt-02 two_stage_A_relax_20261029
+3x3/C0_ref 1507566.stdct-mgmt-02 two_stage_A_relax_20261029
+3x3/C1_CH4_perimRh 1507567.stdct-mgmt-02 two_stage_A_relax_20261029
+3x3/C2_CH4_Ce 1507568.stdct-mgmt-02 two_stage_A_relax_20261029
+3x3/C3_CH3perimRh_HOt 1507569.stdct-mgmt-02 two_stage_A_relax_20261029
+3x3/C4_CH3perimRh_Hfcc 1507570.stdct-mgmt-02 two_stage_A_relax_20261029
+3x3/C5_CH3Ce_HOt 1507571.stdct-mgmt-02 two_stage_A_relax_20261029
+3x3/C7_CH4_Ot 1507572.stdct-mgmt-02 two_stage_A_relax_20261029
+3x3/C8_CH3Ot_HOb 1507573.stdct-mgmt-02 two_stage_A_relax_20261029
+3x3/D0_CeO2_111_p2x2 1507574.stdct-mgmt-02 two_stage_A_relax_20261029
+3x3/D1_Ce2O3_hO_2Odown 1507575.stdct-mgmt-02 two_stage_A_relax_20261029
+3x3/D3_Ce2O3_gasgeom 1507576.stdct-mgmt-02 two_stage_A_relax_20261029
+
+2026-11-02 22:05 SGT  3x3 LDAU fix
+  Cause: build_3x3.py copied B0's LDAUL/LDAUU (Rh Ce O = -1 3 -1 / 0 5 0) to every set unchanged.
+    C1-C5,C7,C8 (Rh Ce O C H): VASP "Error reading item LDAUL", rc=1 at once (1507567-573, r1 1508870-876).
+    A1/A2 (Rh C H): ran with U = 5 eV on C 4f -> A1/A2 energies of 10-29 void.
+    D0/D1/D3 (Ce O): U on O, none on Ce -> D0 result and the running D1/D3 (qdel 1507575/576) void.
+    A0 (Rh only) and C0_ref (Rh Ce O) were correct; C0_ref r1 1508021 accepted, E0 -285.80999.
+  Fix: build_3x3.py ldau_lines() writes per-species LDAU (U on Ce only; no LDAU block without Ce);
+    POSCARs byte-identical to the first build. Old runs moved to inputs_3x3_bad_ldau_20261102/.
+  Resubmitted: A0 1510390, A1 1510391, A2 1510392, C1 1510393, C2 1510394, C3 1510395, C4 1510396,
+    C5 1510397, C7 1510398, C8 1510399, D0 1510400, D1 1510401, D3 1510402.
+  Monitor: FATAL pattern for "I REFUSE TO CONTINUE"; ldau_problem() check in accept() and running rows.
+B NEB 1502824: Exit 143 at 64:51 (10-31 09:02, same time Vanda ssh access dropped), 56 steps, not converged.

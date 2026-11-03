@@ -1,0 +1,14 @@
+A0_ref                 Rh36             natoms= 36 fixed=18 c=25.111 vac=18.57 min_nonbond=nan None img(ads)=nan
+A1_CH4_top             CH4Rh36          natoms= 41 fixed=18 c=25.111 vac=15.00 min_nonbond=1.80 ('H', 'H') img(ads)=6.62
+A2_CH3top_Hfcc         CH4Rh36          natoms= 41 fixed=18 c=25.111 vac=16.14 min_nonbond=1.70 ('H', 'H') img(ads)=5.97
+C0_ref                 Ce2O3Rh36        natoms= 41 fixed=18 c=29.190 vac=18.27 min_nonbond=nan None img(ads)=5.25
+C1_CH4_perimRh         CH4Ce2O3Rh36     natoms= 46 fixed=18 c=29.190 vac=18.27 min_nonbond=1.80 ('H', 'H') img(ads)=5.25
+C2_CH4_Ce              CH4Ce2O3Rh36     natoms= 46 fixed=18 c=29.190 vac=15.99 min_nonbond=1.79 ('H', 'O') img(ads)=5.25
+C3_CH3perimRh_HOt      CH4Ce2O3Rh36     natoms= 46 fixed=18 c=29.190 vac=17.29 min_nonbond=1.78 ('H', 'H') img(ads)=5.25
+C4_CH3perimRh_Hfcc     CH4Ce2O3Rh36     natoms= 46 fixed=18 c=29.190 vac=18.27 min_nonbond=1.70 ('H', 'H') img(ads)=5.25
+C5_CH3Ce_HOt           CH4Ce2O3Rh36     natoms= 46 fixed=18 c=29.190 vac=17.29 min_nonbond=1.78 ('H', 'H') img(ads)=5.25
+C7_CH4_Ot              CH4Ce2O3Rh36     natoms= 46 fixed=18 c=29.190 vac=15.00 min_nonbond=1.80 ('H', 'H') img(ads)=5.25
+C8_CH3Ot_HOb           CH4Ce2O3Rh36     natoms= 46 fixed=18 c=29.190 vac=16.47 min_nonbond=1.43 ('C', 'O') img(ads)=5.25
+D0_CeO2_111_p2x2       Ce12O24          natoms= 36 fixed=12 c=26.776 vac=18.84 min_nonbond=nan None img(ads)=nan
+D1_Ce2O3_hO_2Odown     Ce14O27          natoms= 41 fixed=12 c=26.776 vac=15.04 min_nonbond=nan None img(ads)=3.67
+D3_Ce2O3_gasgeom       Ce14O27          natoms= 41 fixed=12 c=26.776 vac=15.00 min_nonbond=nan None img(ads)=4.78
