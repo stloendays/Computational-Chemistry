@@ -4,6 +4,9 @@ CH₄* → CH₃* + H*/OH* only. Kinetics: ordinary NEB (`LCLIMB = .FALSE.`) fir
 paths that pass the review. Plan: `../weekly_plans/2026-10-15_first_CH4_cleavage_four_models_and_850C_atmospheres.md`;
 next steps: `PLAN_after_D_parent_20261025.md`. Status as of 2026-10-27.
 
+**Model B (Ce₄O₆ layer / Rh(111)), status 2026-11-07: [`B_layer_status_20261107.md`](B_layer_status_20261107.md)**
+— endpoints, the failed first NEB and why, the new IS B5 / B5b, next steps.
+
 ## Current line: Rh(111) p(3×3) and CeO₂(111) p(2×2) (supervisor, 2026-10-29)
 
 The 2026-10-29 guidance changes the cells and the energy definition (plan: `PLAN_20261029_advisor_3x3.md`).

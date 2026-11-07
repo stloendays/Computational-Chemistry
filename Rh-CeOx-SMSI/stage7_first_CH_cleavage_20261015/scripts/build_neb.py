@@ -47,11 +47,18 @@ def dmin_image(cell, p, q):
 
 
 def match_h(ini, fin):
-    """Reorder the FS H atoms onto the IS H (minimum summed displacement)."""
+    """Reorder the FS H atoms onto the IS H.
+    The H that leaves C in the FS (largest C-H distance) is given to the IS H nearest its FS position, i.e. the C-H
+    bond that points at the acceptor breaks; the other three H follow by minimum summed displacement.
+    (2026-11-05: minimum summed displacement alone gave A1 -> A2 an up-pointing H as the breaking one, so the
+    down-pointing H had to flip through the CH3 umbrella; B5/C10/D9 are built with this assignment.)"""
     sy = ini.get_chemical_symbols()
     assert sy == fin.get_chemical_symbols(), "species order differs"
     h = [i for i, s in enumerate(sy) if s == "H"]
-    best = min(itertools.permutations(h), key=lambda perm: sum(
+    c = sy.index("C")
+    t = max(h, key=lambda j: dmin_image(fin.cell, fin.positions[c], fin.positions[j]))
+    brk = min(h, key=lambda i: dmin_image(ini.cell, ini.positions[i], fin.positions[t]))
+    best = min((p for p in itertools.permutations(h) if p[h.index(brk)] == t), key=lambda perm: sum(
         dmin_image(ini.cell, ini.positions[i], fin.positions[j]) for i, j in zip(h, perm)))
     order = list(range(len(fin)))
     for i, j in zip(h, best):
@@ -119,7 +126,7 @@ grep -q "reached required accuracy" 01/OUTCAR && echo "NEB converged" || echo "N
 """
 
 
-def build(model, ini_name, fin_name, raw, out):
+def build(model, ini_name, fin_name, raw, out, inputs=None):
     ini = read(os.path.join(raw, ini_name, "CONTCAR"), format="vasp")
     fin = read(os.path.join(raw, fin_name, "CONTCAR"), format="vasp")
     assert len(ini) == len(fin) and np.allclose(ini.cell, fin.cell), "IS/FS cells or atom counts differ"
@@ -138,7 +145,7 @@ def build(model, ini_name, fin_name, raw, out):
         sub = os.path.join(d, "%02d" % k)
         os.makedirs(sub, exist_ok=True)
         write(os.path.join(sub, "POSCAR"), im, format="vasp", direct=True, sort=False)
-    src = os.path.join(HERE, "inputs", ini_name)
+    src = os.path.join(inputs or os.path.join(HERE, "inputs"), ini_name)
     open(os.path.join(d, "INCAR"), "w", newline="\n").write(incar(os.path.join(src, "INCAR_stageB_relax"), title))
     k = os.path.join(src, "KPOINTS_relax") if os.path.exists(os.path.join(src, "KPOINTS_relax")) else \
         os.path.join(src, "KPOINTS")
@@ -167,9 +174,10 @@ def main():
     ap.add_argument("--pair", nargs=3, metavar=("MODEL", "IS", "FS"))
     ap.add_argument("--raw", default=RAW)
     ap.add_argument("--out", default=OUT)
+    ap.add_argument("--inputs", default=None, help="folder with the endpoint inputs (default inputs/)")
     a = ap.parse_args()
     jobs = [tuple(a.pair)] if a.pair else [(m,) + PAIRS[m] for m in a.models]
-    rep = [build(m, i, f, a.raw, a.out) for m, i, f in jobs]
+    rep = [build(m, i, f, a.raw, a.out, a.inputs) for m, i, f in jobs]
     with open(os.path.join(a.out, "BUILD_REPORT.txt"), "a", newline="\n") as fh:
         fh.write("\n".join(rep) + "\n")
 
