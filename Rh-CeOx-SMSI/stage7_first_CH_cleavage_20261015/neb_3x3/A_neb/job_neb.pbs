@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+#PBS -N s7neb_A_A1A2
+#PBS -P CFP04-CF-046
+#PBS -l select=2:ncpus=36:mpiprocs=36:ompthreads=1:mem=250gb
+#PBS -l walltime=72:00:00
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+for f in INCAR KPOINTS POTCAR 00/POSCAR 00/OUTCAR 07/POSCAR 07/OUTCAR; do
+  test -s "$f" || { echo "Missing or empty $f" >&2; exit 2; }
+done
+module purge
+module load intel/2021b
+export OMP_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+VASP_BIN=/nfs/home/svu/junbotong/software/vasp/NUS_HPC_VASP/vasp_632_vtst_solpp_beef_std
+test -x "$VASP_BIN" || { echo "VASP executable not found: $VASP_BIN" >&2; exit 2; }
+NP=$(wc -l < "$PBS_NODEFILE")
+echo "job_id=$PBS_JOBID host=$(hostname) ranks=$NP workdir=$PBS_O_WORKDIR start=$(date --iso-8601=seconds)"
+START=$(date +%s)
+rm -f STOPCAR
+mpirun -np "$NP" "$VASP_BIN" > vasp_neb.out &
+VP=$!
+# watchdog at 250200 s (69.5 h): LSTOP keeps every image's CONTCAR for a restart
+( while kill -0 "$VP" 2>/dev/null; do
+    if [ $(( $(date +%s) - START )) -ge 250200 ]; then printf 'LSTOP = .TRUE.\n' > STOPCAR; echo watchdog_stop; break; fi
+    sleep 60; done ) &
+WD=$!
+set +e; wait "$VP"; RC=$?; set -e
+kill "$WD" 2>/dev/null || true; wait "$WD" 2>/dev/null || true
+rm -f STOPCAR
+python3 neb_profile.py . > neb_profile.txt || true
+echo "end=$(date --iso-8601=seconds) rc=$RC"
+grep -q "reached required accuracy" 01/OUTCAR && echo "NEB converged" || echo "NEB NOT converged"

@@ -317,3 +317,40 @@ What changed:
   | A | 41 | +0.01 +0.03 +0.07 +0.18 +0.57 +0.39 | — |
   | C | 36 | −0.01 +0.01 +0.40 +1.14 +1.18 +0.75 | ±2.0 on every image |
   | D | 11 | +0.14 +0.62 +3.61 +1.48 +0.25 −0.87 | 2 2 2 2 4 4 |
+
+### 2026-11-07 23:00
+
+- **B5b is on the right state.** At step 96 (Fmax 0.076) it has 4 Ce³⁺ (↑↑↑↑) and E0 −353.4518 eV, within 1 meV of B2's relaxation E0 (−353.45276).
+- **B5 ended on the wrong state.** E0 −352.60983 eV, still 2 Ce³⁺. The monitor rejects it (`ce3_mismatch`); it is archived and B5b replaces it.
+- **D8: CG hit ZBRENT three times.** r1, r2 and r3 stopped at 95, 46 and 39 steps. E0 stayed between −349.442 and −349.447 eV and Fmax between 0.07 and 0.11 eV/Å. r4 (1530824) continues with FIRE (IBRION 3, POTIM 0, IOPT 7).
+- **NEBs at 23:00:**
+
+  | Path | Steps | Images, E − E(00) (eV) | Max force (eV/Å) |
+  |---|---|---|---|
+  | A | 74 | +0.01 +0.03 +0.07 +0.17 +0.51 +0.39 | 0.22 |
+  | C | 70 | −0.01 +0.05 +1.23 +0.87 +0.92 +0.83 | 0.47 |
+  | D | 28 | +0.24 +0.89 +1.98 +1.40 −0.22 −1.06 | up to 5.2 |
+
+### 12.x 2026-11-09 10:20 状态
+
+- Vanda /scratch 集群级写满（df 100%，本人配额 63.7%），11-09 02:06–02:27 打断：D8 r4（1530824，OUTCAR 写入失败）、NEB C（1525494，197 步）、NEB D（1526950，80 步）。PBS server 拒绝连接，暂不能提交。
+- NEB A 1523636 正常到看门狗（11-08 21:40）：148 步，最高像 05 +0.616 eV，ΔE +0.264，Fmax 0.083，未收敛；续算即可。
+- NEB C：第 03 像 +1.05（C–H 1.82 / O–H 1.03，即过渡区），04–06 +0.75…+0.96，FS +0.557；Fmax 0.10–0.40。路径连续，续算。
+- NEB D：第 04 像 +6.51 eV、磁矩 0，几何上转移的 H45 与 CH₃ 的 H42 相距 1.09 Å（H–H 成键）——插值路径让转移的 H 穿过另一个 H，路径本身有问题（与 B 第一轮同类）。需重建 D 路径（H 对应 / CH₃ 翻转），不直接续算。
+- B5b 1528695 收敛（11-08 21:46）：E₀ −353.71444，4 Ce³⁺，CH₄ 完整，Fmax 0.019；但比 B2 低 0.262 eV。原因：整个 Ce₄O₆ 层相对 Rh 平移 ≈0.65 Å（均值 −0.43, +0.48 Å；Rh 顶层不动），落到更低的层/Rh 配位（registry）。B0/B2/B4 都在旧 registry，与 B5b 不可直接比较。拟：B0' = B5b 去 CH₄ 重弛豫；B4' = B4 的层与吸附物平移同一矢量后重弛豫；NEB B5b → B4'。待用户确认。
+
+### 12.y 2026-11-09 10:30 用户确认"改用新层位置"
+
+- B 改在 B5b 的层位置（registry）上重建，B0–B4（旧位置）留作历史：
+  - `inputs_3x3/B11_ref_fromB5b`：B5b CONTCAR 去 CH₄，新母体（ref）；读 B5b WAVECAR，ICHARG 0，ALGO Normal。
+  - `inputs_3x3/B11b_ref_fromB0`：同一 POSCAR，读旧 B0 WAVECAR+CHGCAR（ICHARG 1），备用起点（sup）。两者取 4 Ce³⁺ 且更低者作 B 母体。
+  - `inputs_3x3/B12_CH3Os_HOs_fromB5b`：B4 CONTCAR 的 Ce/O/C/H 平移 (−0.428, +0.498, 0) Å 到 B5b 层位置（残差 0.15–0.55 Å），读 B5b WAVECAR+CHGCAR。新终态（dis）。
+  - NEB_NEXT B 改为 B5b → B12。
+- PBS 恢复后由 `monitor/submit_1109.py` 一次提交（B11、B11b、B12、NEB A 续算、NEB C 续算〔当前像先重跑 stage A〕、D8 r5 FIRE），本地守候 `monitor/wait_pbs_submit_1109.ps1`（cdesktop-detach 名 vanda_submit_1109，每 10 min 试一次，标记 `monitor/submit_1109.done` 防重复）。
+- NEB D 不续算：路径重建后再交。
+
+### 12.z 2026-11-09 11:00 NEB D 重建（用户"现在重建 D"）
+
+- 旧带（1526950，单段 IDPP）存为 `neb_3x3/D_neb_run1_1526950`。失败原因：D9 中 CH₄ 的 H45 离 O38 2.85 Å，D7 中 CH₃ 接在另一侧的 O40（周期像，离 O38 横向 4.1 Å），线性插值在远处拔 H，CH₃ 同时横移 2.3 Å 并转向，第 04 像塌成 H45–H42 1.09 Å（+6.5 eV）。
+- 新带 `build_neb_D_two_keyframes_20261109.py`：两个关键像——02 = 夺 H（C 在 O38/O40 之间，C–O38 2.45，C–H45 1.30，O38–H45 1.15，CH₃ 伞角 80°）；05 = CH₃ 回接（C–O40 2.05，H45 在 O38 上 0.98）；CH₃ 取向用四元数 slerp（刚性转 48°/84°/43°），C、H45 分段线性，slab 线性。各像 H–H ≥ 1.66 Å，C–H 1.09–1.10。
+- 同一作业里先跑各像 stage A，再跑 NEB（MAGMOM 14*1 32*0）。已加入 `submit_1109.py`，PBS 恢复后与 B11/B11b/B12、NEB A/C、D8 一起提交。

@@ -81,7 +81,8 @@ FATAL = [
     (r'BAD TERMINATION|killed by signal', 'MPI 进程被杀'),
     (r'Cannot allocate memory|out of memory|oom-kill', '内存不足'),
     # 2026-11-02: 3x3 C adsorbate INCARs had 3 LDAUL entries for 5 species -> "Error reading item LDAUL"
-    (r'I REFUSE TO CONTINUE|Error reading item', 'VASP 拒绝 INCAR（输入错误）'),
+    # (2026-11-04: "I REFUSE TO CONTINUE" closes every VASP error box, e.g. ZBRENT; it is not an input error)
+    (r'Error reading item', 'VASP 拒绝 INCAR（输入错误）'),
 ]
 # name: (PBS id at submission, kind)
 SYSTEMS = {
@@ -112,7 +113,32 @@ SYSTEMS3 = {
     '3x3/C7_CH4_Ot': ('1510398', 'ch4'), '3x3/C3_CH3perimRh_HOt': ('1510395', 'dis'), '3x3/C4_CH3perimRh_Hfcc': ('1510396', 'dis'),
     '3x3/C5_CH3Ce_HOt': ('1510397', 'dis'), '3x3/C8_CH3Ot_HOb': ('1510399', 'dis'),
     '3x3/D0_CeO2_111_p2x2': ('1510400', 'sup'), '3x3/D1_Ce2O3_hO_2Odown': ('1510401', 'sup'), '3x3/D3_Ce2O3_gasgeom': ('1510402', 'sup'),
+    # D end states on the D1 parent (user 2026-11-04 "建并提交"); D1r = D1 relaxed, re-relaxed at their c = 29.984 A
+    '3x3/D1r_ref_vac15': ('1518228', 'sup'), '3x3/D4_CH4_Ce': ('1518229', 'ch4'), '3x3/D5_CH4_Oc': ('1518230', 'ch4'),
+    '3x3/D6_CH3Ce_HOc': ('1518231', 'dis'), '3x3/D7_CH3Oc_HOc': ('1518232', 'dis'), '3x3/D8_CH3Ce_HOs': ('1518233', 'dis'),
+    # NEB endpoints with a physically possible H transfer (2026-11-05, build_neb_endpoints_20261105.py, user "B 一起重建")
+    '3x3/B5_CH4_toB4': ('1523632', 'ch4'), '3x3/C9_CH3perimRh_HOp': ('1523633', 'dis'),
+    '3x3/C10_CH4_toC9': ('1523634', 'ch4'), '3x3/D9_CH4_toD7': ('1523635', 'ch4'),
+    # 2026-11-06: D9 relaxed the cluster to a geometry 0.32 eV below D4 (Ce13-O39 2.27 -> 2.02 A, CH4 intact);
+    # D10 = that cluster without CH4, to see whether it is a lower D parent than D1
+    # D10 accepted at -327.05190, 0.288 eV below D1r (-326.76395): D10 is the D parent / E_ads reference (11-06)
+    '3x3/D10_ref_D9cluster': ('1525338', 'ref'),
+    # 11-07: B5 relaxes on 2 Ce3+ (0.86 eV above B2); B5b = B2 slab (4 Ce3+) + B5 CH4, from the B2 WAVECAR
+    '3x3/B5b_CH4_toB4_fromB2': ('1528695', 'ch4'),
+    # 11-09 (user "改用新层位置"): B5b ended 0.262 eV below B2 because the whole Ce4O6 layer slid 0.65 A on Rh(111);
+    # B parent and FS rebuilt on that registry. B11b = same POSCAR as B11 from the old B0 WAVECAR+CHGCAR (backup start);
+    # the lower of B11/B11b with 4 Ce3+ becomes the B ref. B0-B4 (old registry) stay as history.
+    '3x3/B11_ref_fromB5b': ('submit_1109', 'ref'), '3x3/B11b_ref_fromB0': ('submit_1109', 'sup'),
+    '3x3/B12_CH3Os_HOs_fromB5b': ('submit_1109', 'dis'),
 }
+# ordinary NEBs on the new cells: model -> (folder under S, PBS id at submission, IS, FS)
+NEB3 = {'A': ('neb_3x3/A_neb', '1523636', 'A1_CH4_top', 'A2_CH3top_Hfcc'),
+        # C: job_neb.pbs = stage A on the images, then the NEB in the same job (supervisor 2026-11-06: no gate)
+        'C': ('neb_3x3/C_neb', '1525352', 'C10_CH4_toC9', 'C9_CH3perimRh_HOp'),
+        'D': ('neb_3x3/D_neb', '1526950', 'D9_CH4_toD7', 'D7_CH3Oc_HOc')}
+NEB_CE3 = {'B': '4', 'C': '2', 'D': '2 → 4'}
+NEB_NEXT = {'B': ('B5b_CH4_toB4_fromB2', 'B12_CH3Os_HOs_fromB5b'),'C': ('C10_CH4_toC9', 'C9_CH3perimRh_HOp'),
+            'D': ('D9_CH4_toD7', 'D7_CH3Oc_HOc')}
 
 
 def two_stage(name):
@@ -530,13 +556,16 @@ def running_row(name, kind, st, j, d):
         hit = [n for n, e0, mag, nscf in ions[-3:] if nscf >= lim]
         if hit:
             attention.append('%s: 弛豫第 %s 离子步 SCF 用满 NELM=%d，这些步的受力不可信' % (name, ','.join(map(str, hit)), lim))
+        # each rise is reported once (2026-11-06: the D9 3->4 rise was re-raised on every run);
+        # st['seen_rise'] = last ionic step already reported, reset when the job id changes.
+        # Magnetic state is not checked while relaxing (supervisor 2026-11-06: intermediate spin states do not
+        # matter, only the final result has to be consistent); ce3_mismatch runs at acceptance only.
+        if st.get('seen_jid') != jid:
+            st.update({'seen_jid': jid, 'seen_rise': 0})
         for (n0, e0, m0, _), (n1, e1, m1, _) in zip(ions, ions[1:]):
-            if m0 is not None and m1 is not None and abs(m1 - m0) > MAG_JUMP:
-                attention.append('%s: 第 %d→%d 离子步总磁矩 %.2f→%.2f μB 跳变（Ce 自旋翻转？）' % (name, n0, n1, m0, m1))
-                break
-        for (n0, e0, m0, _), (n1, e1, m1, _) in zip(ions, ions[1:]):
-            if e1 - e0 > E_RISE:
+            if n1 > st['seen_rise'] and e1 - e0 > E_RISE:
                 attention.append('%s: 第 %d→%d 离子步 E0 升高 %.3f eV' % (name, n0, n1, e1 - e0))
+                st['seen_rise'] = n1
                 break
         fm = forces_free(oc, flg) if flg else None
     if stage in ('stageB_relax', 'stageC_SP'):
@@ -545,6 +574,20 @@ def running_row(name, kind, st, j, d):
     prog = 'SCF %d' % (cur[-1][0] if cur else 0)
     rows.append([name, jid, 'R %s' % wall, stage, '%d（%s）' % (len(ions), prog) if stage == 'stageB_relax' else prog,
                  fmt(fm, '%.3f'), fmt(e, '%.4f'), ce, '—', note])
+
+
+# Ce3+ count of the clean parent per model; a physisorbed CH4* must keep it (2026-11-06: B5 relaxed on a
+# 2-Ce3+ state, ↑00↑, 1.0 eV above B2, and the moment check alone did not flag it)
+CE3_PARENT = {'B': 4, 'C': 2, 'D': 2}
+
+
+def ce3_mismatch(name, kind, ce):
+    """Message when a ch4/ref state of a Ce model has a Ce3+ count other than its parent's, else None."""
+    want = CE3_PARENT.get(os.path.basename(name)[:1])
+    mm = re.match(r'Ce³⁺ (\d+)', ce or '')
+    if kind not in ('ch4', 'ref') or want is None or not mm or int(mm.group(1)) == want:
+        return None
+    return 'Ce³⁺ 个数 %s ≠ 母体 %d（%s），自旋态不对，要从正确态的 WAVECAR 重算' % (mm.group(1), want, ce)
 
 
 def ldau_problem(d, sym):
@@ -596,6 +639,9 @@ def accept(name, kind, d):
     ce, m = ce_summary(sym, mom)
     if any(0.3 < abs(x) < 0.8 for x in m):
         probs.append('Ce 磁矩有中间值（%s）' % ce)
+    cm = ce3_mismatch(name, kind, ce)
+    if cm:
+        probs.append(cm)
     rh = [abs(x) for s, x in zip(sym, mom or []) if s == 'Rh']
     if rh and max(rh) > 0.3:
         probs.append('Rh 局域磁矩最大 %.2f μB（> 0.3）' % max(rh))
@@ -765,7 +811,7 @@ def results_table3(state):
     for k, (_, kind) in SYSTEMS3.items():
         v = s.get(k, {})
         mdl = k[4]
-        ref = E.get('3x3/%s0_ref' % mdl)
+        ref = next((E[x] for x, (_, kk) in SYSTEMS3.items() if x[4] == mdl and kk == 'ref'), None)
         ch4 = [E[x] for x, (_, kk) in SYSTEMS3.items() if x[4] == mdl and kk == 'ch4' and E.get(x) is not None]
         dads = E[k] - ref - eg if kind in ('ch4', 'dis') and None not in (E[k], ref, eg) else None
         drel = E[k] - min(ch4) if kind in ('ch4', 'dis') and ch4 and E[k] is not None else None
@@ -844,6 +890,8 @@ def run(state):
                 ended(name, kind, st, d)
         except Exception as e:
             attention.append('%s: 监控脚本处理出错 %s: %s' % (name, type(e).__name__, str(e)[:150]))
+    if jobs is not None:
+        neb_report(state, jobs)
     # 2026-10-29 user: "你把D的NEB跑起来吧" -> once D4-D8 are accepted, hand the D ordinary NEB to the takeover
     if jobs is not None and all(state['systems'].get(k, {}).get('phase') == 'final' for k in D_ENDPOINTS)             and not os.path.isdir(os.path.join(os.path.dirname(IN), 'neb', 'D_neb')):
         attention.append('D4–D8 全部验收、neb/D_neb 尚未建立：按 PLAN_after_D_parent_20261025 第 5 步建模型 D 的普通 NEB 并提交'
@@ -869,6 +917,59 @@ def run(state):
             state['done'] = True
             log_action('20 个作业全部验收，E_stage7.txt 与 results/stage7_table.md 已写出')
     return qq, al
+
+
+def neb_report(state, jobs):
+    """Ordinary NEBs on the new cells (NEB3): one info line per path while running (steps, highest image vs 00,
+    image moments); one ATTENTION when a job ends. ATTENTION also once the endpoints of a NEB_NEXT path are accepted
+    and its folder does not exist yet (build it as in PLAN_20261029_advisor_3x3.md section 11)."""
+    ns = state.setdefault('neb', {})
+    for m, (rel, jid0, ini, fin) in NEB3.items():
+        d = os.path.join(S, rel)
+        st = ns.setdefault(m, {'jid': jid0, 'phase': 'run'})
+        try:
+            nm = re.search(r'^#PBS -N (\S+)', read(os.path.join(d, 'job_neb.pbs')), re.M).group(1)
+            live = [j for j in jobs.get(nm, []) if j.get('job_state') in ('R', 'Q', 'H', 'W', 'E', 'B', 'S', 'T')]
+            if st.get('E00') is None:
+                st['E00'] = e_sigma0(read(os.path.join(d, '00', 'OUTCAR')))
+            rel_e, mags, nstep = [], [], 0
+            for k in range(1, 7):
+                f = os.path.join(d, '%02d' % k, 'OSZICAR')
+                ions = osz(f)[0] if os.path.exists(f) else []
+                nstep = max(nstep, len(ions))
+                rel_e.append(ions[-1][1] - st['E00'] if ions and st['E00'] is not None else None)
+                mags.append(ions[-1][2] if ions else None)
+            prof = ' '.join('%+.2f' % e if e is not None else '—' for e in rel_e)
+            mg = ' '.join('%.1f' % x if x is not None else '—' for x in mags)
+            state_s = ('%s %s' % (live[-1]['id'], live[-1].get('job_state'))) if live else '结束'
+            info.append('NEB %s（%s → %s）%s：%d 步；各像 E − E(00) = %s eV；磁矩 %s' % (m, ini, fin, state_s, nstep, prof, mg))
+            if not live and st.get('phase') == 'run':
+                o = newest(d, nm + '.o*')
+                tail = read(o)[-400:] if o else ''
+                conv = 'NEB converged' in tail
+                st.update({'phase': 'ended', 'converged': conv})
+                # final electronic state of every image (supervisor 2026-11-06: only the final result has to be
+                # consistent; intermediate spin states are not checked)
+                ce3, chm = [], []
+                for k in range(1, 7):
+                    sym = readpos(os.path.join(d, '%02d' % k, 'POSCAR'))[0]
+                    mom = moments(outcar_tail(os.path.join(d, '%02d' % k, 'OUTCAR')), sym)
+                    ce3.append(ce_summary(sym, mom)[0].replace('Ce³⁺ ', '') if mom else '—')
+                    chm.append(max(abs(x) for s_, x in zip(sym, mom) if s_ in ('C', 'H')) if mom else None)
+                hm = max((x for x in chm if x is not None), default=None)
+                info.append('NEB %s 末态各像 Ce³⁺ %s（应为 %s）；C/H 最大 |m| %s' % (
+                    m, '；'.join('%02d %s' % (k + 1, c) for k, c in enumerate(ce3)), NEB_CE3.get(m, '0'),
+                    '%.2f' % hm if hm is not None else '—'))
+                attention.append('NEB %s 已结束（%s，%d 步，最高像 %s eV）：按 10-15 计划第 5 步检查路径连续性、原子运动和末态自旋，'
+                                 '再决定 CI-NEB 或修路径' % (m, '已收敛' if conv else '未收敛', nstep,
+                                                    max((e for e in rel_e if e is not None), default=float('nan'))))
+        except Exception as e:
+            attention.append('NEB %s: 监控处理出错 %s: %s' % (m, type(e).__name__, str(e)[:120]))
+    for m, (ini, fin) in NEB_NEXT.items():
+        keys = ['3x3/' + ini, '3x3/' + fin]
+        if all(state['systems'].get(k, {}).get('phase') == 'final' for k in keys) and m not in NEB3                 and not os.path.isdir(os.path.join(S, 'neb_3x3', '%s_neb' % m)):
+            attention.append('NEB %s 的端点 %s → %s 已验收：按 PLAN_20261029_advisor_3x3.md 第 11 节建普通 NEB 并提交'
+                             % (m, ini, fin))
 
 
 def main():

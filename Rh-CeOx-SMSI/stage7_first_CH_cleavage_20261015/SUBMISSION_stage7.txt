@@ -1,71 +1,250 @@
-Submitted 2026-10-15 to Vanda, project CFP04-CF-046, walltime 72 h.
-Remote: /scratch/junbotong/Dynamic_SMSI_stage7_first_CH_cleavage_20261015/inputs (POTCAR = potpaw_PBE.54 Rh/Ce/O/C/H)
-A0_ref 1460278
-A1_CH4_top 1460279
-A2_CH3top_Hfcc 1460280
-B0_ref 1460281
-B1_CH4_Ce 1460282
-B2_CH4_Os 1460283
-B3_CH3Ce_HOs 1460284
-B4_CH3Os_HOs 1460285
-C0_ref 1460286
-C1_CH4_perimRh 1460287
-C2_CH4_Ce 1460288
-C3_CH3perimRh_HOt 1460289
-C4_CH3perimRh_Hfcc 1460290
-C5_CH3Ce_HOt 1460291
-C6_CH3farRh_Hfcc 1460292
-D0_CeO2_111 1460293
-D1_Ce2O3_hO_2Odown 1460294
-D2_Ce2O3_hO_1Odown 1460295
-D3_Ce2O3_gasgeom 1460296
-G_CH4 1460297
+A0_ref 1460278.stdct-mgmt-02
+A1_CH4_top 1460279.stdct-mgmt-02
+A2_CH3top_Hfcc 1460280.stdct-mgmt-02
+B0_ref 1460281.stdct-mgmt-02
+B1_CH4_Ce 1460282.stdct-mgmt-02
+B2_CH4_Os 1460283.stdct-mgmt-02
+B3_CH3Ce_HOs 1460284.stdct-mgmt-02
+B4_CH3Os_HOs 1460285.stdct-mgmt-02
+C0_ref 1460286.stdct-mgmt-02
+C1_CH4_perimRh 1460287.stdct-mgmt-02
+C2_CH4_Ce 1460288.stdct-mgmt-02
+C3_CH3perimRh_HOt 1460289.stdct-mgmt-02
+C4_CH3perimRh_Hfcc 1460290.stdct-mgmt-02
+C5_CH3Ce_HOt 1460291.stdct-mgmt-02
+C6_CH3farRh_Hfcc 1460292.stdct-mgmt-02
+D0_CeO2_111 1460293.stdct-mgmt-02
+D1_Ce2O3_hO_2Odown 1460294.stdct-mgmt-02
+D2_Ce2O3_hO_1Odown 1460295.stdct-mgmt-02
+D3_Ce2O3_gasgeom 1460296.stdct-mgmt-02
+G_CH4 1460297.stdct-mgmt-02
+2026-10-16T00:23:15 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-16T00:23:15 [monitor] A0_ref 验收通过（E0 -439.67924, Fmax_free 0.0024, Rh|m|max 0.00 ）
+2026-10-15T16:24:59+08:00 [claude-cli] B0_ref 1460281 / B1_CH4_Ce 1460282 / B2_CH4_Os 1460283: stageA_spinSP hit NELM=500 (ALGO All, EDIFF 1E-5) after ~4 h; energy still decreasing monotonically ~1e-4 eV/step (no charge sloshing). Ce |m| 0.98-0.99 x4 (all Ce3+, consistent with Ce4O6), Rh |m|max 0.03; CH4 intact (stageA is SP, no geometry change). NOT a cluster/quota event: ends 23:25/23:38/23:41 on CN-010 and CN-113, each at exactly 500 SCF steps; home 18.1/40 G. Same as stage-4 L6 (1407170 hit NELM 500, resumed as 1407964 with INCAR_stageA_spinSP_r1 = ISTART 1 / ICHARG 0 from WAVECAR, converged in 340 steps). Suggest (user to decide): per system add INCAR_stageA_spinSP_r1 (ISTART 1, ICHARG 0, rest unchanged) and a job_resumeA.pbs running stageA_spinSP_r1 -> stageB_relax -> cp POSCAR POSCAR_start; cp CONTCAR POSCAR -> stageC_SP, requiring WAVECAR. B3 1460284 (SCF 277) and B4 1460285 (SCF 112) are on the same slow trajectory and will likely end exit 3 too; same resume applies. Nothing resubmitted.
+2026-10-16T05:23:17 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-16T05:24:19+0800 [claude-cli] B0-B4 (1460281-285) 均 exit 3：stageA_spinSP 跑满 NELM 500（ALGO All, ~4 h），E 以 1e-4~1e-3 eV/步单调下降、非振荡，非集群事件。B3/B4 新增：同 B0-B2 轨迹；B3 E0 -351.153、B4 E0 -350.235（未收敛）。磁矩 Ce 0.92-1.00（全 Ce3+），Rh|m|max ≤0.07；B3 Ce2 0.92 + C -0.08 为 CH3-Ce 成键所致。WAVECAR 均在（1.5 GB）。建议（待用户决定）：五个体系按 stage-4 L6 先例续算 INCAR_stageA_spinSP_r1（ISTART 1/ICHARG 0 读 WAVECAR）+ job_resumeA.pbs → B → C。未重投、未改输入。
+2026-10-16T10:23:24 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-16T10:23:24 [monitor] A1_CH4_top 验收通过（E0 -463.72517, Fmax_free 0.0175, Rh|m|max 0.00 C–H 4）
+2026-10-16T15:23:15 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-16T15:24:41+0800 [claude-cli] C0–C3 (1460286–289) 实时核对：F/Exit 3，walltime 11:10–11:58，节点 CN-113/154/010；stageA_spinSP 跑满 NELM 500（ALGO All，约 11–12 h），能量单调缓降（末段 1e-4 eV/步，400 步累计 ~0.03–0.10 eV），非振荡、非集群/配额事件。磁矩：两 Ce 均 0.99–1.00（Ce³⁺，与 Ce₂O₃ 一致），Rh |m|max ≤ 0.015；stageA 为单点，吸附物几何未变。WAVECAR（~2.0 GB）四目录完好。C4–C6 当前 SCF ~200，约 6–7 h 后大概率同样 exit 3。建议（待用户决定）：与 B0–B4 一并按 stage-4 L6 先例（INCAR_stageA_spinSP_r1 仅改 ISTART 1 / ICHARG 0 + job_resumeA.pbs）续算 stageA → B → C。未重投、未改输入。
+2026-10-16T20:24:09 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-17T01:23:50 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-17T01:25:01+0800 [claude-cli] C4(1460290)/C6(1460292) 实时核对 F/Exit 3，walltime 13:32/11:14：stageA_spinSP 跑满 NELM 500（ALGO All），末段 dE ~1e-4 eV/步单调缓降，非振荡、非集群事件；E0 未收敛 -501.142/-501.640；Ce 0.98-1.00（Ce3+），Rh|m|max 0.02，总磁矩 1.79/1.93；WAVECAR 2.06 GB 在。C5 同设置 281 步收敛，现 stageB。建议（待用户）：B0-B4、C0-C4、C6 共 11 个按 stage-4 L6 先例 INCAR_stageA_spinSP_r1（ISTART 1/ICHARG 0 读 WAVECAR）+ job_resumeA.pbs 续 stageA->B->C。未重投、未改输入。
+2026-10-17T06:23:21 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-17T06:23:21 [monitor] A2_CH3top_Hfcc 验收通过（E0 -463.46446, Fmax_free 0.0167, Rh|m|max 0.00 C–H 3）
+2026-10-17T06:23:22 [monitor] G_CH4 验收通过（E0 -24.03719, Fmax_free 0.0031, — ）
+B0_ref 1463445.stdct-mgmt-02 resumeA_20261017
+B1_CH4_Ce 1463446.stdct-mgmt-02 resumeA_20261017
+B2_CH4_Os 1463447.stdct-mgmt-02 resumeA_20261017
+B3_CH3Ce_HOs 1463448.stdct-mgmt-02 resumeA_20261017
+B4_CH3Os_HOs 1463449.stdct-mgmt-02 resumeA_20261017
+C0_ref 1463450.stdct-mgmt-02 resumeA_20261017
+C1_CH4_perimRh 1463451.stdct-mgmt-02 resumeA_20261017
+C2_CH4_Ce 1463452.stdct-mgmt-02 resumeA_20261017
+C3_CH3perimRh_HOt 1463453.stdct-mgmt-02 resumeA_20261017
+C4_CH3perimRh_Hfcc 1463454.stdct-mgmt-02 resumeA_20261017
+C6_CH3farRh_Hfcc 1463455.stdct-mgmt-02 resumeA_20261017
+D1_Ce2O3_hO_2Odown 1463484.stdct-mgmt-02 gamma_relax_k221_SP_20261017
+D2_Ce2O3_hO_1Odown 1463485.stdct-mgmt-02 gamma_relax_k221_SP_20261017
+D3_Ce2O3_gasgeom 1463486.stdct-mgmt-02 gamma_relax_k221_SP_20261017
+2026-10-17T16:23:11 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-17T16:23:12 [monitor] B0_ref 自动续算 r2：stageA_spinSP_r1 SCF 未收敛（exit 3） → 从 stageA_spinSP_r2 续（job_resume_r2.pbs），新作业 1463815
+2026-10-17T16:23:12 [monitor] B2_CH4_Os 自动续算 r2：stageA_spinSP_r1 SCF 未收敛（exit 3） → 从 stageA_spinSP_r2 续（job_resume_r2.pbs），新作业 1463816
+2026-10-17T21:23:14 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-18T02:23:18 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-18T02:24:15 [monitor] C0_ref 验收通过（E0 -478.36918, Fmax_free 0.0176, Ce³⁺ 2 ↑↑ ）
+2026-10-18T07:23:21 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-18T07:23:23 [monitor] C5_CH3Ce_HOt 验收通过（E0 -501.71978, Fmax_free 0.0183, Ce³⁺ 2 ↑↑ C–H 3）
+2026-10-18T12:23:41 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-18T12:23:43 [monitor] B3_CH3Ce_HOs 验收通过（E0 -352.14424, Fmax_free 0.0177, Ce³⁺ 4 ↑↑↑↑ C–H 3）
+2026-10-18T17:23:16 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-18T22:23:15 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-18T22:23:16 [monitor] B1_CH4_Ce 验收通过（E0 -353.42863, Fmax_free 0.0170, Ce³⁺ 4 ↑↑↑↑ C–H 4）
+2026-10-18T22:23:19 [monitor] C3_CH3perimRh_HOt 自动续算 r2：stageA_spinSP_r1 SCF 未收敛（exit 3） → 从 stageA_spinSP_r2 续（job_resume_r2.pbs），新作业 1465723
+2026-10-19T03:23:10 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-19T08:23:13 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-19T08:23:15 [monitor] B4_CH3Os_HOs 验收通过（E0 -353.08487, Fmax_free 0.0187, Ce³⁺ 4 ↑↑↑↑ C–H 3）
+2026-10-19T08:23:18 [monitor] D0_CeO2_111 验收通过（E0 -1150.42897, Fmax_free 0.0154, Ce³⁺ 0（↑0↓0）/48 ）
+2026-10-19T08:25:15+0800 [claude-cli] B0_ref/B2_CH4_Os/C3/D1/D2/D3 Exit 127 根因：续算脚本缺 run_stage 函数定义（.o 文件 'run_stage: command not found'），6 个作业 10-19 04:17 同在 CN-006 启动即退，VASP 未运行、未改任何输出；非集群/配额事件。r2 脚本由 monitor_stage7.py make_resume 生成（按 '\nrun_stage ' 切分时把函数定义切掉），D 组 job_resume_gamma.pbs 由 gamma_switch_20261017.py 同样切分生成。已修 make_resume（在第一个 run_stage 调用处切分，保留定义）并上传。重投（原链不变，仅补函数定义，物理设置未改）：B0_ref r3 1466456、B2_CH4_Os r3 1466457、C3_CH3perimRh_HOt r3 1466458（INCAR_stageA_spinSP_r3 = r2 原样，读 WAVECAR 续 stageA→B→C）；D1 r1 1466459、D2 r1 1466460、D3 r1 1466461（job_resume_r1.pbs = gamma 链 Γ 弛豫→2x2x1 SP）。state.json 已写 auto_n/jid（备份 state.json.bak_20261019_claude），qstat 6 个均 Q。
+2026-10-19T13:23:17 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-19T13:23:18 [monitor] B0_ref 验收通过（E0 -329.38082, Fmax_free 0.0172, Ce³⁺ 4 ↑↑↑↑ ）
+2026-10-19T13:23:19 [monitor] B2_CH4_Os 自动续算 r4：stageA_spinSP_r3 SCF 未收敛（exit 3） → 从 stageA_spinSP_r4 续（job_resume_r4.pbs），新作业 1466951
+2026-10-19T18:23:26 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-19T23:23:32 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-20T04:23:27 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-20T09:23:15 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-20T14:23:20 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-20T19:23:12 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-20T19:23:13 [monitor] C2_CH4_Ce 验收通过（E0 -502.45381, Fmax_free 0.0159, Ce³⁺ 2 ↑↑ C–H 4）
+2026-10-20T19:23:14 [monitor] C6_CH3farRh_Hfcc 验收通过（E0 -502.10370, Fmax_free 0.0175, Ce³⁺ 2 ↑↑ C–H 3）
+2026-10-21T00:23:15 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-21T00:23:17 [monitor] C1_CH4_perimRh 自动续算 r2：stageB_relax 弛豫未收敛（exit 4）；看门狗 250200 s 触发 STOPCAR → 从 stageB_relax_r2 续（job_resume_r2.pbs），新作业 1471367
+2026-10-21T05:23:14 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-21T10:23:11 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-21T15:23:15 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-21T20:23:30 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-21T20:23:31 [monitor] B2_CH4_Os 验收通过（E0 -353.45328, Fmax_free 0.0191, Ce³⁺ 4 ↑↑↑↑ C–H 4）
+2026-10-21T20:23:33 [monitor] C4_CH3perimRh_Hfcc 自动续算 r2：stageB_relax 弛豫未收敛（exit 4）；看门狗 250200 s 触发 STOPCAR → 从 stageB_relax_r2 续（job_resume_r2.pbs），新作业 1473341
+2026-10-21T20:25:08 [claude-cli] C1_CH4_perimRh 为监控误报：r2 弛豫（1471367）6 步已 reached required accuracy（OUTCAR_stageB_relax_r2），stageC_SP EDIFF 已达；accept() 原先固定读旧 OUTCAR_stageB_relax（未收敛的 r1 段，Fmax 0.078）。已改为取最新 OUTCAR_stageB_relax*/OUTCAR_stageC_SP*（备份 monitor_stage7.py.bak_20261021_claude），服务器回放：C1 验收通过 E0 -502.51121 eV、Fmax_free 0.019、Ce3+ 2 ↑↑、C–H 4；B2/C2/G/A1 回放结果不变。无需续算。
+2026-10-21T20:25:08 [claude-cli] D1_Ce2O3_hO_2Odown 第 17→18 步 E0 +0.157 eV 为 IBRION 2 CG 试探步越过极小，第 19 步回落至 -1186.601（低于第 17 步 -1186.575），第 22 步 -1186.884 持续下降；SCF 每步 11–49 次、mag 2.00 稳定，作业 1466459 正常运行，不处理。
+2026-10-22T16:23:20 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-22T16:23:22 [monitor] C3_CH3perimRh_HOt 验收通过（E0 -502.74638, Fmax_free 0.0195, Ce³⁺ 2 ↑↑ C–H 3）
+2026-10-22T16:23:22 [monitor] C4_CH3perimRh_Hfcc 验收通过（E0 -502.03733, Fmax_free 0.0174, Ce³⁺ 2 ↑↑ C–H 3）
+2026-10-22T21:23:23 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-23T02:23:30 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-23T07:23:21 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-23T10:30:50 [monitor] D1_Ce2O3_hO_2Odown 自动续算 r2：stageB_relax 弛豫未收敛（exit 4）；看门狗 250200 s 触发 STOPCAR → 从 stageB_relax_r2 续（job_resume_r2.pbs），新作业 1478967
+2026-10-23T17:23:21 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-23T17:23:22 [monitor] D2_Ce2O3_hO_1Odown 自动续算 r2：stageB_relax 弛豫未收敛（exit 4）；看门狗 250200 s 触发 STOPCAR → 从 stageB_relax_r2 续（job_resume_r2.pbs），新作业 1480807
+2026-10-23T17:23:23 [monitor] D3_Ce2O3_gasgeom 自动续算 r2：stageB_relax 弛豫未收敛（exit 4）；看门狗 250200 s 触发 STOPCAR → 从 stageB_relax_r2 续（job_resume_r2.pbs），新作业 1480808
+2026-10-24T03:23:13 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-24T08:23:15 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-25T04:23:17 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-25T09:23:15 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-25T09:23:16 [monitor] D1_Ce2O3_hO_2Odown 验收通过（E0 -1187.25472, Fmax_free 0.0190, Ce³⁺ 2（↑2↓0）/50 ）
+2026-10-25T14:23:19 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-26T05:23:39 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-26T10:23:15 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
 A_neb 1493916.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261026
 B_neb 1493917.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261026
 C_neb 1493918.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261026
 C_neb 1493938.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261026_resubmit_after_system_hold_1493918
 A_neb 1493946.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261026_restart_ISTART0_after_NBANDS_mismatch_1493916
-B_neb 1496320.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261026_restart_ISTART0_after_wavecar_start_failed
-C_neb 1496321.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261026_restart_ISTART0_after_wavecar_start_failed
+2026-10-26T15:23:25 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-26T15:23:26 [monitor] D2_Ce2O3_hO_1Odown 自动续算 r3：stageB_relax_r2 弛豫未收敛（exit 4）；看门狗 250200 s 触发 STOPCAR → 从 stageB_relax_r3 续（job_resume_r3.pbs），新作业 1494893
+2026-10-26T15:23:27 [monitor] D3_Ce2O3_gasgeom 自动续算 r3：stageB_relax_r2 弛豫未收敛（exit 4）；看门狗 250200 s 触发 STOPCAR → 从 stageB_relax_r3 续（job_resume_r3.pbs），新作业 1494894
+2026-10-26T20:23:54 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+B_neb 1496320.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261026_restart_ISTART0_after_wavecar_start_failed_1493917
+C_neb 1496321.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261026_restart_ISTART0_after_wavecar_start_failed_1493938
+2026-10-27T01:05:22 [manual] B_neb 1496320 stopped: images converging to high-spin states (default MAGMOM 1/atom, ALGO Normal); outputs in failed_highspin_default_magmom_1496320; awaiting user decision on MAGMOM / per-image stage A
+2026-10-27T01:05:45 [manual] C_neb 1496321 stopped: images converging to high-spin states (default MAGMOM 1/atom, ALGO Normal); outputs in failed_highspin_default_magmom_1496321; awaiting user decision on MAGMOM / per-image stage A
 B_neb 1497146.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261027_MAGMOM_Ce1_user_approved
 C_neb 1497147.stdct-mgmt-02 ordinary_NEB_LCLIMB_F_20261027_MAGMOM_Ce1_user_approved
+2026-10-27T06:23:46 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-27T09:23:35 [manual] B_neb 1497146 stopped: Ce images did not reach SCF convergence with MAGMOM Ce1 + ALGO Normal (NELM 300 hit, mag drifting); outputs in failed_scf_unconverged_magmom_algoNormal_1497146; held for user decision
+2026-10-27T09:23:56 [manual] C_neb 1497147 stopped: Ce images did not reach SCF convergence with MAGMOM Ce1 + ALGO Normal (NELM 300 hit, mag drifting); outputs in failed_scf_unconverged_magmom_algoNormal_1497147; held for user decision
 B_neb 1497610.stdct-mgmt-02 ordinary_NEB_two_step_stageA_images_then_NEB_MAGMOM_Ce1_20261027
 C_neb 1497611.stdct-mgmt-02 ordinary_NEB_two_step_stageA_images_then_NEB_MAGMOM_Ce1_20261027
-B_neb 1502824.stdct-mgmt-02 stageA_r1_resume_20261028_images04_05_not_converged_after_1497610_exit3 (prior outputs in stageA_r0r1_1497610/)
-C7_CH4_Ot 1506831.stdct-mgmt-02 supplement_20261029_CH4_over_cluster_top_O
-C8_CH3Ot_HOb 1506832.stdct-mgmt-02 supplement_20261029_CH3O_on_Ot_plus_OH_bridging
-D3_Ce2O3_gasgeom 1506857.stdct-mgmt-02 final_SP_r1_ISTART1_from_WAVECAR_after_1494894_watchdog_in_SP (relax r3 converged)
-D2_Ce2O3_hO_1Odown 1506867.stdct-mgmt-02 relax_r4_from_r3_CONTCAR_after_1494893_walltime (user: 继续算 D2, 2026-10-29)
-D4_CH4_Ce 1507327.stdct-mgmt-02 D_endpoint_parent_D3_relaxed_20261029
-D5_CH4_edge 1507330.stdct-mgmt-02 D_endpoint_parent_D3_relaxed_20261029
-D6_CH3Ce_HOc 1507331.stdct-mgmt-02 D_endpoint_parent_D3_relaxed_20261029
-D7_CH3Os_HOc 1507333.stdct-mgmt-02 D_endpoint_parent_D3_relaxed_20261029
-D8_CH3Ce_HOs 1507334.stdct-mgmt-02 D_endpoint_parent_D3_relaxed_20261029
---- 2026-10-29 supervisor (Notion 14): A/C -> Rh(111) p(3x3), D -> CeO2(111) p(2x2) 3TL, no final SP; inputs_3x3/ (build_3x3.py); 4x4 jobs 1497611 1506831 1506832 1506857 1506867 1507330-334 cancelled (user)
-3x3/A0_ref 1507563.stdct-mgmt-02 two_stage_A_relax_20261029
-3x3/A1_CH4_top 1507564.stdct-mgmt-02 two_stage_A_relax_20261029
-3x3/A2_CH3top_Hfcc 1507565.stdct-mgmt-02 two_stage_A_relax_20261029
-3x3/C0_ref 1507566.stdct-mgmt-02 two_stage_A_relax_20261029
-3x3/C1_CH4_perimRh 1507567.stdct-mgmt-02 two_stage_A_relax_20261029
-3x3/C2_CH4_Ce 1507568.stdct-mgmt-02 two_stage_A_relax_20261029
-3x3/C3_CH3perimRh_HOt 1507569.stdct-mgmt-02 two_stage_A_relax_20261029
-3x3/C4_CH3perimRh_Hfcc 1507570.stdct-mgmt-02 two_stage_A_relax_20261029
-3x3/C5_CH3Ce_HOt 1507571.stdct-mgmt-02 two_stage_A_relax_20261029
-3x3/C7_CH4_Ot 1507572.stdct-mgmt-02 two_stage_A_relax_20261029
-3x3/C8_CH3Ot_HOb 1507573.stdct-mgmt-02 two_stage_A_relax_20261029
-3x3/D0_CeO2_111_p2x2 1507574.stdct-mgmt-02 two_stage_A_relax_20261029
-3x3/D1_Ce2O3_hO_2Odown 1507575.stdct-mgmt-02 two_stage_A_relax_20261029
-3x3/D3_Ce2O3_gasgeom 1507576.stdct-mgmt-02 two_stage_A_relax_20261029
+2026-10-27T16:23:19 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-27T21:23:22 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-28T02:23:19 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-28T07:23:19 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-28T12:23:17 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-28T22:23:51 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-29T12:07:13 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-29T18:23:19 [monitor] 3x3/A0_ref 验收通过（E0 -247.32376, Fmax_free 0.0105, Rh|m|max 0.01 ）
+2026-10-29T23:23:16 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-29T23:23:18 [monitor] 3x3/A1_CH4_top 验收通过（E0 -271.37560, Fmax_free 0.0194, Rh|m|max 0.00 C–H 4）
+2026-10-29T23:23:18 [monitor] 3x3/A2_CH3top_Hfcc 验收通过（E0 -271.11301, Fmax_free 0.0199, Rh|m|max 0.00 C–H 3）
+2026-10-29T23:23:18 [monitor] 3x3/C0_ref 自动续算 r1：stageA_spinSP SCF 未收敛（exit 3） → 从 stageA_spinSP_r1 续（job_resume_r1.pbs），新作业 1508021
+2026-10-30T04:23:16 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-30T09:23:13 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-30T14:23:18 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-30T19:23:14 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-31T00:23:18 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-10-31T05:23:13 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-02T17:23:18 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-02T17:23:20 [monitor] 3x3/C1_CH4_perimRh 自动续算 r1：非正常结束（Exit 1，最后阶段 stageA_spinSP） → 从 stageA_spinSP_r1 续（job_resume_r1.pbs），新作业 1508870
+2026-11-02T17:23:20 [monitor] 3x3/C2_CH4_Ce 自动续算 r1：非正常结束（Exit 1，最后阶段 stageA_spinSP） → 从 stageA_spinSP_r1 续（job_resume_r1.pbs），新作业 1508871
+2026-11-02T17:23:20 [monitor] 3x3/C7_CH4_Ot 自动续算 r1：非正常结束（Exit 1，最后阶段 stageA_spinSP） → 从 stageA_spinSP_r1 续（job_resume_r1.pbs），新作业 1508872
+2026-11-02T17:23:21 [monitor] 3x3/C3_CH3perimRh_HOt 自动续算 r1：非正常结束（Exit 1，最后阶段 stageA_spinSP） → 从 stageA_spinSP_r1 续（job_resume_r1.pbs），新作业 1508873
+2026-11-02T17:23:21 [monitor] 3x3/C4_CH3perimRh_Hfcc 自动续算 r1：非正常结束（Exit 1，最后阶段 stageA_spinSP） → 从 stageA_spinSP_r1 续（job_resume_r1.pbs），新作业 1508874
+2026-11-02T17:23:22 [monitor] 3x3/C5_CH3Ce_HOt 自动续算 r1：非正常结束（Exit 1，最后阶段 stageA_spinSP） → 从 stageA_spinSP_r1 续（job_resume_r1.pbs），新作业 1508875
+2026-11-02T17:23:22 [monitor] 3x3/C8_CH3Ot_HOb 自动续算 r1：非正常结束（Exit 1，最后阶段 stageA_spinSP） → 从 stageA_spinSP_r1 续（job_resume_r1.pbs），新作业 1508876
+2026-11-02T22:04:26 [monitor] 3x3/C0_ref 验收通过（E0 -285.80999, Fmax_free 0.0191, Ce³⁺ 2 ↑↑ ）
+2026-11-03T03:23:31 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-03T03:23:32 [monitor] 3x3/A0_ref 验收通过（E0 -247.32369, Fmax_free 0.0104, Rh|m|max 0.01 ）
+2026-11-03T03:23:34 [monitor] 3x3/C2_CH4_Ce 自动续算 r1：stageA_spinSP SCF 未收敛（exit 3） → 从 stageA_spinSP_r1 续（job_resume_r1.pbs），新作业 1511579
+2026-11-03T03:23:35 [monitor] 3x3/C4_CH3perimRh_Hfcc 自动续算 r1：stageA_spinSP SCF 未收敛（exit 3） → 从 stageA_spinSP_r1 续（job_resume_r1.pbs），新作业 1511580
+2026-11-03T08:23:23 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-03T08:23:24 [monitor] 3x3/A1_CH4_top 验收通过（E0 -271.37836, Fmax_free 0.0176, Rh|m|max 0.00 C–H 4）
+2026-11-03T08:23:25 [monitor] 3x3/A2_CH3top_Hfcc 验收通过（E0 -271.11411, Fmax_free 0.0187, Rh|m|max 0.00 C–H 3）
+2026-11-03T08:23:27 [monitor] 3x3/C7_CH4_Ot 自动续算 r1：stageA_spinSP SCF 未收敛（exit 3） → 从 stageA_spinSP_r1 续（job_resume_r1.pbs），新作业 1512054
+2026-11-03T08:23:28 [monitor] 3x3/D0_CeO2_111_p2x2 验收通过（E0 -287.60259, Fmax_free 0.0158, Ce³⁺ 0（↑0↓0）/12 ）
+2026-11-03T10:25:23 [monitor] 3x3/C8_CH3Ot_HOb 自动续算 r1：stageA_spinSP SCF 未收敛（exit 3） → 从 stageA_spinSP_r1 续（job_resume_r1.pbs），新作业 1512375
+2026-11-03T13:23:23 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-03T14:51:35 [monitor] 3x3/D3_Ce2O3_gasgeom 验收通过（E0 -325.37274, Fmax_free 0.0181, Ce³⁺ 2（↑2↓0）/14 ）
+2026-11-03T18:24:03 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-03T21:52:32 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-04T04:23:29 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-04T04:23:34 [monitor] 3x3/C4_CH3perimRh_Hfcc 验收通过（E0 -309.41137, Fmax_free 0.0174, Ce³⁺ 2 ↑↑ C–H 3）
+2026-11-04T04:23:46 [monitor] 3x3/D1_Ce2O3_hO_2Odown 验收通过（E0 -326.73516, Fmax_free 0.0192, Ce³⁺ 2（↑2↓0）/14 ）
+2026-11-04T09:23:15 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-04T09:23:18 [monitor] 3x3/C7_CH4_Ot 验收通过（E0 -309.89508, Fmax_free 0.0174, Ce³⁺ 2 ↑↑ C–H 4）
+2026-11-04T09:23:19 [monitor] 3x3/C3_CH3perimRh_HOt 验收通过（E0 -310.10673, Fmax_free 0.0119, Ce³⁺ 2 ↑↑ C–H 3）
+2026-11-04T10:43:53 [monitor] 3x3/C1_CH4_perimRh 验收通过（E0 -309.98269, Fmax_free 0.0162, Ce³⁺ 2 ↑↑ C–H 4）
+3x3/D1r_ref_vac15 1518228.stdct-mgmt-02 two_stage_A_relax_D1parent_p2x2_c29.984_20261104
+3x3/D4_CH4_Ce 1518229.stdct-mgmt-02 two_stage_A_relax_D1parent_p2x2_c29.984_20261104
+3x3/D5_CH4_Oc 1518230.stdct-mgmt-02 two_stage_A_relax_D1parent_p2x2_c29.984_20261104
+3x3/D6_CH3Ce_HOc 1518231.stdct-mgmt-02 two_stage_A_relax_D1parent_p2x2_c29.984_20261104
+3x3/D7_CH3Oc_HOc 1518232.stdct-mgmt-02 two_stage_A_relax_D1parent_p2x2_c29.984_20261104
+3x3/D8_CH3Ce_HOs 1518233.stdct-mgmt-02 two_stage_A_relax_D1parent_p2x2_c29.984_20261104
+2026-11-04T16:33:17 [monitor] 3x3/D1r_ref_vac15 手动续算 r1：ZBRENT（第 20 步，Fmax≈0.02）→ CONTCAR→POSCAR 续 stageB_relax_r1，新作业 1519010
+3x3/D1r_ref_vac15 1519010 relax_r1_from_CONTCAR_after_1518228_ZBRENT_step20 (manual, 2026-11-04)
+2026-11-04T19:23:39 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-05T00:25:02 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-05T05:23:10 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-05T05:23:11 [monitor] 3x3/C2_CH4_Ce 自动续算 r2：stageB_relax 弛豫未收敛（exit 4） → 从 stageB_relax_r2 续（job_resume_r2.pbs），新作业 1521459
+2026-11-05T05:23:13 [monitor] 3x3/D5_CH4_Oc 验收通过（E0 -350.82324, Fmax_free 0.0187, Ce³⁺ 2（↑2↓0）/14 C–H 4）
+2026-11-05T10:09:59 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-05T10:10:01 [monitor] 3x3/C2_CH4_Ce 验收通过（E0 -309.93639, Fmax_free 0.0200, Ce³⁺ 2 ↑↑ C–H 4）
+2026-11-05T10:10:01 [monitor] 3x3/C5_CH3Ce_HOt 自动续算 r1：stageB_relax 弛豫未收敛（exit 4） → 从 stageB_relax_r1 续（job_resume_r1.pbs），新作业 1522434
+2026-11-05T10:10:06 [monitor] 3x3/D4_CH4_Ce 验收通过（E0 -350.82572, Fmax_free 0.0188, Ce³⁺ 2（↑2↓0）/14 C–H 4）
+2026-11-05T15:25:04 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-05T15:25:23 [monitor] 3x3/D6_CH3Ce_HOc 验收通过（E0 -349.96899, Fmax_free 0.0190, Ce³⁺ 3（↑2↓1）/14 C–H 3）
+2026-11-05T15:25:56 [monitor] 3x3/D7_CH3Oc_HOc 验收通过（E0 -352.32810, Fmax_free 0.0159, Ce³⁺ 4（↑4↓0）/14 C–H 3）
+2026-11-05T15:45:38 [monitor] 3x3/D8_CH3Ce_HOs 手动续算 r1：ZBRENT → CONTCAR→POSCAR 续 stageB_relax_r1，新作业 1523417
+3x3/D8_CH3Ce_HOs 1523417.stdct-mgmt-02 relax_r1_from_CONTCAR_after_1518233_ZBRENT (manual, 2026-11-05)
+2026-11-05T15:49:18 [monitor] 3x3/C8_CH3Ot_HOb 验收通过（E0 -309.76631, Fmax_free 0.0143, Ce³⁺ 2 ↑↑ C–H 3）
+3x3/B5_CH4_toB4 1523632.stdct-mgmt-02 two_stage_A_relax_NEB_endpoint_physical_H_transfer_20261105
+3x3/C9_CH3perimRh_HOp 1523633.stdct-mgmt-02 two_stage_A_relax_NEB_endpoint_physical_H_transfer_20261105
+3x3/C10_CH4_toC9 1523634.stdct-mgmt-02 two_stage_A_relax_NEB_endpoint_physical_H_transfer_20261105
+3x3/D9_CH4_toD7 1523635.stdct-mgmt-02 two_stage_A_relax_NEB_endpoint_physical_H_transfer_20261105
+neb_3x3/A_neb 1523636.stdct-mgmt-02 ordinary_NEB_A1_A2_p3x3_breaking_H_down_20261105
+2026-11-06T06:23:14 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-06T06:23:17 [monitor] 3x3/C5_CH3Ce_HOt 验收通过（E0 -309.83666, Fmax_free 0.0172, Ce³⁺ 2 ↑↑ C–H 3）
+2026-11-06T06:23:19 [monitor] 3x3/B5_CH4_toB4 自动续算 r1：stageA_spinSP SCF 未收敛（exit 3） → 从 stageA_spinSP_r1 续（job_resume_r1.pbs），新作业 1524516
+2026-11-06T09:45:37 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-06T11:24:17 [monitor] 3x3/C9_CH3perimRh_HOp 验收通过（E0 -309.37819, Fmax_free 0.0148, Ce³⁺ 2 ↑↑ C–H 3）
+2026-11-06T12:09:59 [monitor] 3x3/C10_CH4_toC9 验收通过（E0 -309.93514, Fmax_free 0.0192, Ce³⁺ 2 ↑↑ C–H 4）
 
-2026-11-02 22:05 SGT  3x3 LDAU fix
-  Cause: build_3x3.py copied B0's LDAUL/LDAUU (Rh Ce O = -1 3 -1 / 0 5 0) to every set unchanged.
-    C1-C5,C7,C8 (Rh Ce O C H): VASP "Error reading item LDAUL", rc=1 at once (1507567-573, r1 1508870-876).
-    A1/A2 (Rh C H): ran with U = 5 eV on C 4f -> A1/A2 energies of 10-29 void.
-    D0/D1/D3 (Ce O): U on O, none on Ce -> D0 result and the running D1/D3 (qdel 1507575/576) void.
-    A0 (Rh only) and C0_ref (Rh Ce O) were correct; C0_ref r1 1508021 accepted, E0 -285.80999.
-  Fix: build_3x3.py ldau_lines() writes per-species LDAU (U on Ce only; no LDAU block without Ce);
-    POSCARs byte-identical to the first build. Old runs moved to inputs_3x3_bad_ldau_20261102/.
-  Resubmitted: A0 1510390, A1 1510391, A2 1510392, C1 1510393, C2 1510394, C3 1510395, C4 1510396,
-    C5 1510397, C7 1510398, C8 1510399, D0 1510400, D1 1510401, D3 1510402.
-  Monitor: FATAL pattern for "I REFUSE TO CONTINUE"; ldau_problem() check in accept() and running rows.
-B NEB 1502824: Exit 143 at 64:51 (10-31 09:02, same time Vanda ssh access dropped), 56 steps, not converged.
+# 2026-11-06T12:17:01 manual actions (Claude, user "目前呢")
+B5 1525336: qdel 1524516 (stage B on the 2-Ce3+ state, ↑00↑, +1.0 eV vs B2); stage A r2 from the B4 WAVECAR (4 Ce3+, same cell and NBANDS 276), original POSCAR; chain stageA_spinSP_r2 -> stageB_relax
+D1r 1525337: stageB_relax_r1 exit 4 (NSW 400 + ZBRENT, E0 -326.7613); CONTCAR -> POSCAR, stageB_relax_r2
+D10 1525338: new reference: D9 CONTCAR (step ~90, Fmax 0.06) without C/H; inputs = D1r (same c 29.984)
+2026-11-06T12:17:01 [monitor] B5 1525336: qdel 1524516 (stage B on the 2-Ce3+ state, ↑00↑, +1.0 eV vs B2); stage A r2 from the B4 WAVECAR (4 Ce3+, same cell and NBANDS 276), original POSCAR; chain stageA_spinSP_r2 -> stageB_relax
+2026-11-06T12:17:01 [monitor] D1r 1525337: stageB_relax_r1 exit 4 (NSW 400 + ZBRENT, E0 -326.7613); CONTCAR -> POSCAR, stageB_relax_r2
+2026-11-06T12:17:01 [monitor] D10 1525338: new reference: D9 CONTCAR (step ~90, Fmax 0.06) without C/H; inputs = D1r (same c 29.984)
+NEB C 1525352: neb_3x3/C_neb, C10_CH4_toC9 -> C9_CH3perimRh_HOp, 6 IDPP images (H45 breaks toward O38, other C-H 1.09-1.13 A); job_stageA.pbs = stage A on the images (MAGMOM 36*0 2*1 8*0) only; job_neb.pbs after the per-image Ce3+ check (PLAN sec. 11)
+2026-11-06T12:21:18 [monitor] NEB C 1525352: neb_3x3/C_neb, C10_CH4_toC9 -> C9_CH3perimRh_HOp, 6 IDPP images (H45 breaks toward O38, other C-H 1.09-1.13 A); job_stageA.pbs = stage A on the images (MAGMOM 36*0 2*1 8*0) only; job_neb.pbs after the per-image Ce3+ check (PLAN sec. 11)
+NEB C: 1525352 (stage A only) deleted while queued; 1525494 = job_neb.pbs (stage A on the images, then the NEB in one job). Supervisor 2026-11-06: intermediate spin states are not checked, only the final result
+2026-11-06T12:52:34 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-06T16:23:20 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-06T16:23:21 [monitor] 3x3/D1r_ref_vac15 验收通过（E0 -326.76395, Fmax_free 0.0192, Ce³⁺ 2（↑2↓0）/14 ）
+2026-11-06T16:23:23 [monitor] 3x3/B5_CH4_toB4 自动续算 r3：stageA_spinSP_r2 SCF 未收敛（exit 3） → 从 stageA_spinSP_r3 续（job_resume_r3.pbs），新作业 1526021
+2026-11-06T16:23:24 [monitor] 3x3/D9_CH4_toD7 验收通过（E0 -351.14990, Fmax_free 0.0200, Ce³⁺ 2（↑2↓0）/14 C–H 4）
+2026-11-06T16:23:24 [monitor] 3x3/D10_ref_D9cluster 验收通过（E0 -327.05190, Fmax_free 0.0200, Ce³⁺ 2（↑2↓0）/14 ）
+D8 1526948: stageB_relax_r1 ZBRENT fatal at step 95 (E0 -349.4373); CONTCAR -> POSCAR, stageB_relax_r2
+2026-11-06T20:19:06 [monitor] D8 1526948: stageB_relax_r1 ZBRENT fatal at step 95 (E0 -349.4373); CONTCAR -> POSCAR, stageB_relax_r2
+NEB D 1526950: neb_3x3/D_neb, D9_CH4_toD7 -> D7_CH3Oc_HOc, 6 IDPP images (H45 breaks toward O38, 24 deg in D9; C goes to O40), MAGMOM 14*1 32*0, stage A + NEB in one job. D reference switched to D10 (-327.05190, 0.288 eV below D1r)
+2026-11-06T20:21:08 [monitor] NEB D 1526950: neb_3x3/D_neb, D9_CH4_toD7 -> D7_CH3Oc_HOc, 6 IDPP images (H45 breaks toward O38, 24 deg in D9; C goes to O40), MAGMOM 14*1 32*0, stage A + NEB in one job. D reference switched to D10 (-327.05190, 0.288 eV below D1r)
+2026-11-06T21:23:14 [monitor] 3x3/B5_CH4_toB4 自动续算 r4：stageA_spinSP_r3 SCF 未收敛（exit 3） → 从 stageA_spinSP_r4 续（job_resume_r4.pbs），新作业 1527073
+2026-11-07T02:23:24 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-07T07:23:27 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-07T10:46:26 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+3x3/B5b_CH4_toB4_fromB2 1528686: B5 (1527073) is relaxing on 2 Ce3+ (↑00↑, E -352.5925, 0.86 eV above B2) even after stage A from the B4 WAVECAR; B5b = B2 CONTCAR slab (4 Ce3+) + the B5 CH4 (C/H positions of the B5 CONTCAR), stage A from the B2 WAVECAR (ISTART 1, ICHARG 0). B5 keeps running and is judged at the end
+2026-11-07T10:48:17 [monitor] 3x3/B5b_CH4_toB4_fromB2 1528686: B5 (1527073) is relaxing on 2 Ce3+ (↑00↑, E -352.5925, 0.86 eV above B2) even after stage A from the B4 WAVECAR; B5b = B2 CONTCAR slab (4 Ce3+) + the B5 CH4 (C/H positions of the B5 CONTCAR), stage A from the B2 WAVECAR (ISTART 1, ICHARG 0). B5 keeps running and is judged at the end
+3x3/D8_CH3Ce_HOs 1528687: stageB_relax_r2 ZBRENT fatal at step 46 (E0 -349.4445); CONTCAR -> POSCAR, stageB_relax_r3
+2026-11-07T10:48:17 [monitor] 3x3/D8_CH3Ce_HOs 1528687: stageB_relax_r2 ZBRENT fatal at step 46 (E0 -349.4445); CONTCAR -> POSCAR, stageB_relax_r3
+3x3/B5b_CH4_toB4_fromB2 1528695: 1528686 stage A (ALGO All, ISTART 1/ICHARG 0 from the B2 WAVECAR) diverged from SCF step 1 (+325 eV, rising; B5 r2-r4 started the same way); now stage A with ALGO Normal, ISTART 1, ICHARG 1 from the B2 WAVECAR + CHGCAR (B2 stage B started this way at -353.2 eV). Old outputs in failed_algoAll_1528686/
+2026-11-07T10:52:15 [monitor] 3x3/B5b_CH4_toB4_fromB2 1528695: 1528686 stage A (ALGO All, ISTART 1/ICHARG 0 from the B2 WAVECAR) diverged from SCF step 1 (+325 eV, rising; B5 r2-r4 started the same way); now stage A with ALGO Normal, ISTART 1, ICHARG 1 from the B2 WAVECAR + CHGCAR (B2 stage B started this way at -353.2 eV). Old outputs in failed_algoAll_1528686/
+2026-11-07T17:24:21 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-07T22:23:40 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+D8 1530824: CG (IBRION 2) hit ZBRENT three times (r1 95, r2 46, r3 39 steps; E0 -349.442 to -349.447, Fmax 0.07-0.11); stageB_relax_r4 from CONTCAR with FIRE (IBRION 3, POTIM 0, IOPT 7), EDIFFG unchanged
+2026-11-07T23:00:57 [monitor] D8 1530824: CG (IBRION 2) hit ZBRENT three times (r1 95, r2 46, r3 39 steps; E0 -349.442 to -349.447, Fmax 0.07-0.11); stageB_relax_r4 from CONTCAR with FIRE (IBRION 3, POTIM 0, IOPT 7), EDIFFG unchanged
+2026-11-08T03:23:22 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-08T08:23:15 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-08T13:24:12 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-08T18:23:15 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-08T23:24:24 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-08T23:24:31 [monitor] 3x3/B5b_CH4_toB4_fromB2 验收通过（E0 -353.71444, Fmax_free 0.0186, Ce³⁺ 4 ↑↑↑↑ C–H 4）
