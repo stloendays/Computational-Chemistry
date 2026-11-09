@@ -1,7 +1,8 @@
 """2026-11-09: submit after the /scratch-full outage (11-09 ~02:00) once PBS answers.
 B11/B11b/B12 = B on the B5b layer registry (user: 改用新层位置); NEB A resume (watchdog stop, 148 steps);
-NEB C resume (killed by ENOSPC; stage A redone on the current images, then NEB); D8 r5 (FIRE, killed by ENOSPC).
-NEB D (user 11-09 "现在重建 D"): new band from build_neb_D_two_keyframes_20261109.py, stage A then NEB."""
+NEB C resume (killed by ENOSPC; NEB only); D8 r5 (FIRE, killed by ENOSPC).
+NEB D (user 11-09 "现在重建 D"): new band from build_neb_D_two_keyframes_20261109.py, NEB only.
+User 11-09: no stage A any more ("之后都不需要算"): B11/B11b/B12 run stage B only, NEBs start from ISTART 0."""
 import json, os, re, shutil, sys
 sys.path.insert(0, '/scratch/junbotong/Dynamic_SMSI_stage7_first_CH_cleavage_20261015/monitor')
 import monitor_stage7 as m
@@ -38,10 +39,10 @@ SUB.append(('neb_3x3/A_neb', j, 'resume from image CONTCARs (1523636 watchdog st
 d = os.path.join(S, 'neb_3x3', 'C_neb')
 for k in range(1, 7):
     m.sh('cp POSCAR POSCAR_run1 && cp CONTCAR POSCAR && cp OSZICAR OSZICAR_run1 && cp OUTCAR OUTCAR_run1; rm -f WAVECAR CHGCAR', cwd=os.path.join(d, '%02d' % k))
-m.sh('mkdir -p run1_1525494 && mv STAGEA_DONE STAGEA_STARTED vasp_neb.out vasp_neb_stageA.out vasp_neb_stageA_r1.out s7neb_C_C10C9.o1525494 run1_1525494/', cwd=d)
+m.sh('mkdir -p run1_1525494 && mv vasp_neb.out vasp_neb_stageA.out vasp_neb_stageA_r1.out s7neb_C_C10C9.o1525494 run1_1525494/', cwd=d)
 j = qsub('job_neb.pbs', d)
 st['neb']['C'] = {'jid': j, 'phase': 'run', 'E00': st['neb']['C'].get('E00'), 'run1': '1525494 killed by /scratch full at 197 steps'}
-SUB.append(('neb_3x3/C_neb', j, '1525494 killed by /scratch full (ENOSPC) at 197 steps; CONTCAR -> POSCAR, stage A on the current images, then NEB'))
+SUB.append(('neb_3x3/C_neb', j, '1525494 killed by /scratch full (ENOSPC) at 197 steps; CONTCAR -> POSCAR, NEB only (no stage A, user 11-09), ISTART 0 / MAGMOM Ce 1'))
 d = os.path.join(S, 'neb_3x3', 'D_neb')
 j = qsub('job_neb.pbs', d)
 st['neb']['D'] = {'jid': j, 'phase': 'run', 'E00': st['neb']['D'].get('E00'),

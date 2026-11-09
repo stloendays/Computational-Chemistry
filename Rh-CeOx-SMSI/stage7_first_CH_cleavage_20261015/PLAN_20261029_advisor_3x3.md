@@ -354,3 +354,9 @@ What changed:
 - 旧带（1526950，单段 IDPP）存为 `neb_3x3/D_neb_run1_1526950`。失败原因：D9 中 CH₄ 的 H45 离 O38 2.85 Å，D7 中 CH₃ 接在另一侧的 O40（周期像，离 O38 横向 4.1 Å），线性插值在远处拔 H，CH₃ 同时横移 2.3 Å 并转向，第 04 像塌成 H45–H42 1.09 Å（+6.5 eV）。
 - 新带 `build_neb_D_two_keyframes_20261109.py`：两个关键像——02 = 夺 H（C 在 O38/O40 之间，C–O38 2.45，C–H45 1.30，O38–H45 1.15，CH₃ 伞角 80°）；05 = CH₃ 回接（C–O40 2.05，H45 在 O38 上 0.98）；CH₃ 取向用四元数 slerp（刚性转 48°/84°/43°），C、H45 分段线性，slab 线性。各像 H–H ≥ 1.66 Å，C–H 1.09–1.10。
 - 同一作业里先跑各像 stage A，再跑 NEB（MAGMOM 14*1 32*0）。已加入 `submit_1109.py`，PBS 恢复后与 B11/B11b/B12、NEB A/C、D8 一起提交。
+
+### 12.w 2026-11-09 用户：不再跑 stage A（"不需要，之后都不需要算"）
+
+- NEB C 续算、新 NEB D：INCAR_neb 改 ISTART 0 / ICHARG 2（MAGMOM 保留 Ce 1），目录里放 STAGEA_DONE，作业直接跑 NEB；原 INCAR 存为 INCAR_neb.istart1_20261109。
+- B11/B11b/B12：job.pbs 只跑 stageB_relax（原脚本存为 job.pbs.with_stageA_20261109）；B11 只有 B5b WAVECAR → ICHARG 0；B11b、B12 有 CHGCAR → ICHARG 1；ALGO Normal。
+- 以后的 NEB B（B5b → B12）同样不跑 stage A。

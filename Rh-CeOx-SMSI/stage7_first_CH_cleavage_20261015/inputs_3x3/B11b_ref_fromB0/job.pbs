@@ -7,7 +7,7 @@
 
 set -euo pipefail
 cd "$PBS_O_WORKDIR"
-for f in INCAR_stageA_spinSP INCAR_stageB_relax POSCAR KPOINTS POTCAR; do
+for f in INCAR_stageB_relax POSCAR KPOINTS POTCAR; do
   test -s "$f" || { echo "Missing or empty $f" >&2; exit 2; }
 done
 module purge
@@ -42,6 +42,5 @@ run_stage () {
     relax) grep -q "reached required accuracy" OUTCAR || { echo "stage=$tag RELAX NOT converged"; exit 4; } ;;
   esac
 }
-run_stage stageA_spinSP LABORT scf
 run_stage stageB_relax LSTOP relax
 echo "end=$(date --iso-8601=seconds) rc=0"
