@@ -20,9 +20,12 @@ Mechanical in-protocol actions (user, 2026-10-17: "授予监控更大的权利�
       stageB* relax not converged / watchdog / wall   -> CONTCAR -> POSCAR (backups kept), INCAR_stageB_relax_rN
                                                          (ISTART 1/ICHARG 1 if WAVECAR else 0/2) -> stageC_SP
       stageC* SCF not converged / wall                -> INCAR_stageC_SP_rN (ALGO All, NELM 500, reads WAVECAR)
-    No resume when: fatal VASP marker, PBS Exit < 0 / hold, missing input, adsorbate/structure flag, no ionic step
-    written (stage B), missing WAVECAR (stage A/C) or MAX_AUTO reached -> ATTENTION -> headless Claude takeover,
-    which may resume under the same rules (claude_takeover_prompt_stage7.md).
+    No resume when: hard VASP error (EDDDAV/BRMIX/hermitian/internal/memory/input), missing input, adsorbate/structure
+    flag, no ionic step written or no new ionic step since the last resume (stage B), missing WAVECAR (stage A/C)
+    -> ATTENTION -> headless Claude takeover, which resumes itself (claude_takeover_prompt_stage7.md).
+  2026-11-09 user "你要确保cli的接手能够自动续算，不要有权限限制": no cap on resumes (MAX_AUTO None); PBS Exit < 0
+    and interrupt-type markers (disk full, ZBRENT, MPI killed, segfault) in stage B resume from CONTCAR; an NEB that
+    ends unconverged is resumed in place (neb_resume: CONTCAR -> POSCAR per image, STAGEA_DONE, qsub job_neb.pbs).
 
 Per job: PBS state, stage, ionic steps, free-atom Fmax, energy, Ce moment summary, exit code.
 Done (rc=0 chain) -> acceptance: relaxation "reached required accuracy", SP "EDIFF is reached", free-atom
@@ -50,6 +53,8 @@ HISTORY -> check (DynSMSI stage 2-6 + D3 records)
   10-13     desorption / O2 formation during a relaxation                                  -> structure flags
   stage 7   (new) adsorbate left the surface, CH4 dissociated spontaneously, CH3+H recombined, H2 formed
                                                                                           -> adsorbate flags (report only)
+  11-10     PBS requeued an old NEB job after the outage into the dir of its resume job    -> one live job per
+                                                                                             directory (dup_jobs: qdel)
 """
 import os, re, json, glob, math, subprocess, datetime, time, traceback
 
@@ -99,8 +104,13 @@ SYSTEMS = {
     'D6_CH3Ce_HOc': ('1507331', 'dis'), 'D7_CH3Os_HOc': ('1507333', 'dis'), 'D8_CH3Ce_HOs': ('1507334', 'dis'),
     'G_CH4': ('1460297', 'gas'),
 }
-RETIRED = {'C7_CH4_Ot', 'C8_CH3Ot_HOb', 'D2_Ce2O3_hO_1Odown', 'D3_Ce2O3_gasgeom', 
-           'D4_CH4_Ce', 'D5_CH4_edge', 'D6_CH3Ce_HOc', 'D7_CH3Os_HOc', 'D8_CH3Ce_HOs'}  # 2026-10-29 supervisor: A/C -> Rh p(3x3), D -> CeO2 p(2x2); 4x4 jobs cancelled by the user
+RETIRED = {'3x3/B5_CH4_toB4',  # 11-10: superseded by B5b (B2 slab, 4 Ce3+, from the B2 WAVECAR; accepted 11-08)
+           'C7_CH4_Ot', 'C8_CH3Ot_HOb', 'D2_Ce2O3_hO_1Odown', 'D3_Ce2O3_gasgeom', 
+           'D4_CH4_Ce', 'D5_CH4_edge', 'D6_CH3Ce_HOc', 'D7_CH3Os_HOc', 'D8_CH3Ce_HOs',
+           # 11-10 user "停掉让位": stopped to free the 6-job limit for B13/D11; no auto-resume
+           '3x3/D8_CH3Ce_HOs', '3x3/B11b_ref_fromB0',
+           # 11-12 user "停掉 B13": CH3 + H recombined to CH4 (C-H 4, E0 -353.517, B5b +0.20 eV); qdel 1535330, no auto-resume
+           '3x3/B13_CH3_HO45_fromB5b'}  # 2026-10-29 supervisor: A/C -> Rh p(3x3), D -> CeO2 p(2x2); 4x4 jobs cancelled by the user
 D_ENDPOINTS = ['D4_CH4_Ce', 'D5_CH4_edge', 'D6_CH3Ce_HOc', 'D7_CH3Os_HOc', 'D8_CH3Ce_HOs']   # parent D3, 2026-10-29
 STAGES = ['stageA_spinSP', 'stageB_relax', 'stageC_SP']
 # 2026-10-29 supervisor (Notion 14): A and C on Rh(111) p(3x3), D on CeO2(111) p(2x2) 3 TL; no separate final single
@@ -130,15 +140,31 @@ SYSTEMS3 = {
     # the lower of B11/B11b with 4 Ce3+ becomes the B ref. B0-B4 (old registry) stay as history.
     '3x3/B11_ref_fromB5b': ('submit_1109', 'ref'), '3x3/B11b_ref_fromB0': ('submit_1109', 'sup'),
     '3x3/B12_CH3Os_HOs_fromB5b': ('submit_1109', 'dis'),
+    # 11-10 (user "停掉并重建", "不要用手动插值的方式做"): D9 -> D7 was two events (C-H cleavage + CH3 crossing Ce13
+    # to O40) and D7 sat on a D1/D10 hybrid cluster. New D end states on the D10 cluster (build_D11_D12_onD10_20261110.py):
+    # D11 = D9 with only H45 on O38 (first C-H cleavage FS), D12 = D7 CH3O* + OH* on the D10 cluster (replaces D7).
+    '3x3/D11_CH3Ce_HO38_fromD9': ('1535058', 'dis'), '3x3/D12_CH3O40_HO38_onD10': ('1535461', 'dis'), '3x3/D13_CH3onCe13_HO38_fromD11': ('1541115', 'dis'),
+    # 11-10 (user "重建 B 末态"): dist.pl B5b -> B12 8.53 A, C lateral 3.96 A (CH3 migration to O40). B13 = B5b with only
+    # H50 moved onto O45 (dist.pl 2.24 A, build_B13_fromB5b_20261110.py); NEB B = B5b -> B13. B12 stays as CH3O* + OH*.
+    '3x3/B13_CH3_HO45_fromB5b': ('1535330', 'dis'),
+    # 11-12 (user "提交 B14"): B13 recombined to CH4. B14 = B12 motif moved under the B5b CH4: CH3 on O43 (C-O 1.43 A),
+    # H50 on O45; slab = B5b. dist.pl B5b -> B14 6.30 A (B5b -> B12 9.14 A), C lateral 1.93 A. B5b WAVECAR+CHGCAR, ICHARG 1.
+    '3x3/B14_CH3O43_HO45_fromB5b': ('1546187', 'dis'),
 }
 # ordinary NEBs on the new cells: model -> (folder under S, PBS id at submission, IS, FS)
 NEB3 = {'A': ('neb_3x3/A_neb', '1523636', 'A1_CH4_top', 'A2_CH3top_Hfcc'),
         # C: job_neb.pbs = stage A on the images, then the NEB in the same job (supervisor 2026-11-06: no gate)
         'C': ('neb_3x3/C_neb', '1525352', 'C10_CH4_toC9', 'C9_CH3perimRh_HOp'),
-        'D': ('neb_3x3/D_neb', '1526950', 'D9_CH4_toD7', 'D7_CH3Oc_HOc')}
-NEB_CE3 = {'B': '4', 'C': '2', 'D': '2 → 4'}
-NEB_NEXT = {'B': ('B5b_CH4_toB4_fromB2', 'B12_CH3Os_HOs_fromB5b'),'C': ('C10_CH4_toC9', 'C9_CH3perimRh_HOp'),
-            'D': ('D9_CH4_toD7', 'D7_CH3Oc_HOc')}
+        # 11-11 user "补好并提交": CI-NEB of A from the converged ordinary NEB 1535023 (own WAVECARs, LCLIMB .TRUE.)
+        'A_ci': ('neb_3x3/A_cineb', '1539729', 'A1_CH4_top', 'A2_CH3top_Hfcc'),
+        # 11-13 CLI takeover: ordinary NEB B5b -> B14 (build_neb.py --pair, IDPP, no stage A, MAGMOM Ce 1)
+        'B': ('neb_3x3/B_neb', '1550784', 'B5b_CH4_toB4_fromB2', 'B14_CH3O43_HO45_fromB5b')}
+# 11-12 user "D的普通neb就不用跑了": NEB D 1539734 (D9 -> D11) qdel'd after 2 ionic steps; no NEB for D.
+# D: runs 1526950 (IDPP) and 1535025 (hand-built keyframes) used the D7 FS -> archived as neb_3x3/D_neb_run1_1526950 and
+# D_neb_run2_keyframe_1535025 (11-10). NEB D = D9 -> D11, built with build_neb.py (IDPP) once D11 is accepted.
+NEB_CE3 = {'B': '4', 'C': '2', 'D': '2 → D11 末态的个数'}
+# 11-12: B13 failed (recombined to CH4); B5b -> B12 needs CH3 migration (dist.pl 8.53 A), NEB B = B5b -> B14 (11-12).
+NEB_NEXT = {'C': ('C10_CH4_toC9', 'C9_CH3perimRh_HOp')}
 
 
 def two_stage(name):
@@ -147,7 +173,11 @@ def two_stage(name):
 
 def sysdir(name):
     return os.path.join(IN3, name[4:]) if two_stage(name) else os.path.join(IN, name)
-MAX_AUTO = 4          # automatic resumes per system
+# 2026-11-09 user: "你要确保cli的接手能够自动续算，不要有权限限制" -> no cap on automatic resumes. A loop is stopped
+# by progress instead: a stage-B resume needs ionic steps from the run that just ended, an NEB resume needs NEB steps.
+MAX_AUTO = None       # automatic resumes per system (None = unlimited)
+# fatal markers that only mean the run was interrupted (node / MPI / disk / line search) -> resume from CONTCAR
+RESUMABLE_FATAL = {'磁盘/配额写满', 'ZBRENT 线搜索致命错误', 'MPI 进程被杀', '程序崩溃（forrtl/段错误）'}
 QUOTA_BLOCK = False   # set in run() when a quota gate trips: no automatic resume
 
 NOW = datetime.datetime.now()
@@ -241,6 +271,42 @@ def queue():
         attention.append('qstat 不可用或输出无法解析（rc=%s）：%s；本次只报告' % (rc, out[:200]))
         return None
     return jobs
+
+
+LIVE = ('R', 'Q', 'H', 'W', 'E', 'B', 'S', 'T')
+
+
+def dup_jobs(state, jobs):
+    """2026-11-10: after the Vanda outage PBS requeued the original NEB C job 1525494 (Rerunable, run_count 2, started
+    from the old POSCARs) into neb_3x3/C_neb, where the resume job 1535024 was already running: two VASP runs writing
+    the same OUTCAR/CONTCAR. Rule: one live job per working directory under S. Keep a job that was not requeued
+    (run_count <= 1), then the job the state tracks, then the newest PBS id; qdel the others and drop them from `jobs`."""
+    tracked = {str(v.get('jid')) for grp in ('systems', 'neb') for v in state.get(grp, {}).values() if v.get('jid')}
+    bydir = {}
+    for js in jobs.values():
+        for j in js:
+            wd = (j.get('Variable_List') or {}).get('PBS_O_WORKDIR', '').rstrip('/')
+            if j.get('job_state') in LIVE and j.get('job_state') != 'E' and wd.startswith(S + '/') \
+                    and str(j.get('Job_Owner', '')).startswith('junbotong'):
+                bydir.setdefault(wd, []).append(j)
+    for wd, js in bydir.items():
+        if len(js) < 2:
+            continue
+        keep = max(js, key=lambda x: (int(x.get('run_count', 1) or 1) <= 1, x['id'] in tracked, int(x['id'])))
+        rel = os.path.relpath(wd, S)
+        for j in js:
+            if j is keep:
+                continue
+            rc, out = sh('qdel %s' % j['id'], timeout=60)
+            if rc != 0:
+                attention.append('%s: 同一目录有两个作业（%s 与 %s），qdel %s 失败：%s；接手删掉多余的那个'
+                                 % (rel, j['id'], keep['id'], j['id'], out[:100]))
+                continue
+            log_action('%s: 同一目录两个作业同时在跑，qdel %s（%s，run_count %s%s），保留 %s'
+                       % (rel, j['id'], j.get('job_state'), j.get('run_count', '?'),
+                          '，PBS 重排' if int(j.get('run_count', 1) or 1) > 1 else '', keep['id']))
+            for name in list(jobs):
+                jobs[name] = [x for x in jobs[name] if x['id'] != j['id']]
 
 
 def job_hist(jid):
@@ -522,7 +588,7 @@ def running_row(name, kind, st, j, d):
     wall = j.get('resources_used', {}).get('walltime', '—')
     jid = j['id']
     if stt == 'H' or 'too many failed attempts' in j.get('comment', ''):
-        attention.append('%s: PBS %s 被挂起（%s）；监控不 qdel/重投，需用户决定' % (name, jid, j.get('comment', '')[:120]))
+        attention.append('%s: PBS %s 被挂起（%s）；接手先 qrls，释放不了就 qdel 后原样重投' % (name, jid, j.get('comment', '')[:120]))
         rows.append([name, jid, 'H', '挂起', '—', '—', '—', '—', '—', j.get('comment', '')[:40]])
         return
     if stt != 'R':
@@ -698,14 +764,19 @@ def make_resume(name, kind, d, stage, n):
 
 def auto_resume(name, kind, st, d, last, why, fatal, ex):
     """Mechanical resume of a non-fatal stop; returns the new PBS id or None (caller then raises ATTENTION)."""
-    if fatal or not last or (ex is not None and int(ex) in (2,)) or (ex is not None and int(ex) < 0):
+    # 2026-11-09: PBS Exit < 0 (node / system) and interrupt-type fatal markers are resumed too
+    hard = [f for f in (fatal or []) if f not in RESUMABLE_FATAL]
+    if hard or not last or (ex is not None and int(ex) == 2):
         return None
     n = st.get('auto_n', 0) + 1
-    if n > MAX_AUTO:
+    if MAX_AUTO is not None and n > MAX_AUTO:
         why.append('自动续算已达上限 %d 次' % MAX_AUTO)
         return None
     stage = last.replace('stage', '')[:1]
     if stage not in ('A', 'B', 'C'):
+        return None
+    if fatal and stage != 'B':
+        why.append('%s 在 %s 中断，只有弛豫能从 CONTCAR 机械续算' % ('；'.join(fatal), last))
         return None
     flags = []
     structure_flags(name, kind, d, flags)
@@ -721,6 +792,11 @@ def auto_resume(name, kind, st, d, last, why, fatal, ex):
         if not ions or not os.path.exists(con) or os.path.getsize(con) == 0:
             why.append('弛豫没有写出离子步/CONTCAR，不自动续算')
             return None
+        sig = '%d %.5f' % (len(ions), ions[-1][1])
+        if st.get('resume_sig') == sig:       # unlimited resumes: stop only when the last resume made no progress
+            why.append('上次自动续算后没有新的离子步（%s），机械续算无效' % sig)
+            return None
+        st['resume_sig'] = sig
         sh('cp POSCAR POSCAR_before_r%d && cp CONTCAR CONTCAR_before_r%d && cp CONTCAR POSCAR' % (n, n), cwd=d)
     pbs, tag = make_resume(name, kind, d, stage, n)
     rc, out = sh('qsub %s' % pbs, cwd=d, timeout=60)
@@ -792,7 +868,7 @@ def ended(name, kind, st, d):
     if QUOTA_BLOCK:
         why.append('配额超限，暂不自动续算')
     ions, cur = osz(os.path.join(d, 'OSZICAR'))
-    msg = '%s: PBS %s 已结束，%s；未自动续算，需要处理' % (name, jid, '；'.join(why))
+    msg = '%s: PBS %s 已结束，%s；脚本未能机械续算，交接手续算' % (name, jid, '；'.join(why))
     st.update({'phase': 'stopped', 'msg': msg})
     attention.append(msg)
     abnormal.append((name, pbs_time(st.get('end'))))
@@ -856,6 +932,8 @@ def run(state):
             attention.append('%s 配额 %.1f%%（%.1f/%.0f G）超过 %.0f%%，作业可能被一起杀掉（09-23 教训）' % (label, qq[key][2], qq[key][0], qq[key][1], lim))
     al = allocation()
     jobs = queue()
+    if jobs is not None:
+        dup_jobs(state, jobs)
     for name, (jid0, kind) in (list(SYSTEMS.items()) + list(SYSTEMS3.items()) if jobs is not None else []):
         if name in RETIRED:
             continue
@@ -919,6 +997,77 @@ def run(state):
     return qq, al
 
 
+def neb_resume(m, d, st, o, nstep):
+    """2026-11-09 (user: CLI takeover must resume automatically, no permission limits): an ordinary NEB that ended
+    unconverged without a hard VASP error is resumed in place: every image's CONTCAR -> POSCAR (POSCAR, CONTCAR,
+    OUTCAR, OSZICAR kept as *_before_rN), STAGEA_DONE so job_neb.pbs never reruns stage A (user 11-09), same INCAR,
+    qsub job_neb.pbs. Returns the new PBS id or None (the caller then raises ATTENTION for the takeover)."""
+    why = []
+    fatal = fatal_markers(d, [o] if o else [])
+    hard = [f for f in fatal if f not in RESUMABLE_FATAL]
+    ex = None
+    h = job_hist(st.get('jid')) if st.get('jid') else None
+    if h:
+        ex = h.get('Exit_status')
+    if hard:
+        why.append('致命错误：' + '；'.join(hard))
+    if ex is not None and int(ex) == 2:
+        why.append('输入缺失（exit 2）')
+    if nstep == 0:
+        why.append('本次没有走出 NEB 离子步')
+    if QUOTA_BLOCK:
+        why.append('配额超限')
+    imgs = ['%02d' % k for k in range(1, 7)]
+    if any(not os.path.exists(os.path.join(d, i, 'CONTCAR')) or os.path.getsize(os.path.join(d, i, 'CONTCAR')) == 0
+           for i in imgs):
+        why.append('有像缺 CONTCAR')
+    if why:
+        st['resume_why'] = '；'.join(why)
+        return None
+    n = st.get('auto_n', 0) + 1
+    for i in imgs:
+        sh('for f in POSCAR CONTCAR OUTCAR OSZICAR; do [ -e "$f" ] && cp -p "$f" "${f}_before_r%d"; done; '
+           'cp CONTCAR POSCAR' % n, cwd=os.path.join(d, i))
+    sh('[ -e vasp_neb.out ] && cp -p vasp_neb.out vasp_neb.out_before_r%d; touch STAGEA_DONE' % n, cwd=d)
+    # 2026-11-18 (user): a resume reads every image's WAVECAR. C_neb restarted from scratch (ISTART 0 / ICHARG 2,
+    # rewritten from INCAR_neb by job_neb.pbs each run) and burnt NELM = 300 on 5 of 6 images per restart.
+    # Same physics; ICHARG 1 (B, CHGCAR start) is left alone.
+    if all(os.path.exists(os.path.join(d, i, 'WAVECAR')) and os.path.getsize(os.path.join(d, i, 'WAVECAR')) > 0
+           for i in imgs):
+        for name in ('INCAR_neb', 'INCAR'):
+            p = os.path.join(d, name)
+            if not os.path.exists(p):
+                continue
+            with open(p) as f:
+                inc = f.read()
+            new_inc = re.sub(r'^ISTART = 0\s*$', 'ISTART = 1', inc, flags=re.M)
+            new_inc = re.sub(r'^ICHARG = 2\s*$', 'ICHARG = 0', new_inc, flags=re.M)
+            if new_inc != inc:
+                sh('cp -p %s %s.istart0_before_r%d' % (name, name, n), cwd=d)
+                with open(p, 'w') as f:
+                    f.write(new_inc)
+    rc, out = sh('qsub job_neb.pbs', cwd=d, timeout=60)
+    if rc != 0 or not re.match(r'^\d+', out):
+        st['resume_why'] = 'qsub 失败：%s' % out[:100]
+        return None
+    new = out.split('.')[0]
+    st.update({'auto_n': n, 'jid': new, 'phase': 'run'})
+    st.pop('resume_why', None)
+    log_action('NEB %s 自动续算 r%d：未收敛（%d 步%s），各像 CONTCAR → POSCAR，新作业 %s'
+               % (m, n, nstep, '，' + '；'.join(fatal) if fatal else '', new))
+    write_sub('neb_3x3/%s_neb %s.stdct-mgmt-02 auto_resume_r%d_CONTCAR_to_POSCAR (monitor, %s)'
+              % (m, new, n, NOW.strftime('%Y-%m-%d')))
+    return new
+
+
+def write_sub(line):
+    try:
+        with open(SUBLOG, 'a') as f:
+            f.write(line + '\n')
+    except OSError:
+        pass
+
+
 def neb_report(state, jobs):
     """Ordinary NEBs on the new cells (NEB3): one info line per path while running (steps, highest image vs 00,
     image moments); one ATTENTION when a job ends. ATTENTION also once the endpoints of a NEB_NEXT path are accepted
@@ -943,10 +1092,24 @@ def neb_report(state, jobs):
             mg = ' '.join('%.1f' % x if x is not None else '—' for x in mags)
             state_s = ('%s %s' % (live[-1]['id'], live[-1].get('job_state'))) if live else '结束'
             info.append('NEB %s（%s → %s）%s：%d 步；各像 E − E(00) = %s eV；磁矩 %s' % (m, ini, fin, state_s, nstep, prof, mg))
+            if live:
+                lid = sorted(live, key=lambda x: int(x['id']))[-1]['id']
+                if lid != st.get('jid'):          # resubmitted (submit_1109, takeover, auto-resume): track the new job
+                    st.update({'jid': lid, 'phase': 'run'})
+                    st.pop('converged', None)
+                # 11-11: CI-NEB A 1539627 sat in a PBS system hold (Exit -3, 21 failed starts) without an ATTENTION
+                for j in live:
+                    if j.get('job_state') == 'H' or 'too many failed attempts' in j.get('comment', ''):
+                        attention.append('NEB %s: PBS %s 被挂起（%s）；接手先 qrls，释放不了就 qdel 后原样重投 job_neb.pbs'
+                                         % (m, j['id'], j.get('comment', '')[:120]))
             if not live and st.get('phase') == 'run':
                 o = newest(d, nm + '.o*')
                 tail = read(o)[-400:] if o else ''
                 conv = 'NEB converged' in tail
+                if not conv:
+                    new = neb_resume(m, d, st, o, nstep)
+                    if new:
+                        continue
                 st.update({'phase': 'ended', 'converged': conv})
                 # final electronic state of every image (supervisor 2026-11-06: only the final result has to be
                 # consistent; intermediate spin states are not checked)
@@ -960,9 +1123,16 @@ def neb_report(state, jobs):
                 info.append('NEB %s 末态各像 Ce³⁺ %s（应为 %s）；C/H 最大 |m| %s' % (
                     m, '；'.join('%02d %s' % (k + 1, c) for k, c in enumerate(ce3)), NEB_CE3.get(m, '0'),
                     '%.2f' % hm if hm is not None else '—'))
-                attention.append('NEB %s 已结束（%s，%d 步，最高像 %s eV）：按 10-15 计划第 5 步检查路径连续性、原子运动和末态自旋，'
-                                 '再决定 CI-NEB 或修路径' % (m, '已收敛' if conv else '未收敛', nstep,
-                                                    max((e for e in rel_e if e is not None), default=float('nan'))))
+                top = max((e for e in rel_e if e is not None), default=float('nan'))
+                if conv and m.endswith('_ci'):
+                    attention.append('CI-NEB %s 已收敛（%d 步，爬坡像最高 %s eV）：检查爬坡像几何与各像 Ce³⁺，汇报给用户；'
+                                     '下一步是爬坡像频率验证（沿 C–H 方向只有一个虚频），需用户确认后再提交' % (m, nstep, top))
+                elif conv:
+                    attention.append('NEB %s 已收敛（%d 步，最高像 %s eV）：按 10-15 计划第 5 步检查路径连续性、原子运动和末态自旋，'
+                                     '汇报路径是否可以上 CI-NEB' % (m, nstep, top))
+                else:
+                    attention.append('NEB %s 未收敛（%d 步，最高像 %s eV），脚本未能机械续算（%s）：交接手续算'
+                                     % (m, nstep, top, st.get('resume_why', '原因不明')))
         except Exception as e:
             attention.append('NEB %s: 监控处理出错 %s: %s' % (m, type(e).__name__, str(e)[:120]))
     for m, (ini, fin) in NEB_NEXT.items():

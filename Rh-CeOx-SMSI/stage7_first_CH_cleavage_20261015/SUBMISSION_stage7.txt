@@ -248,3 +248,84 @@ D8 1530824: CG (IBRION 2) hit ZBRENT three times (r1 95, r2 46, r3 39 steps; E0 
 2026-11-08T18:23:15 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
 2026-11-08T23:24:24 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
 2026-11-08T23:24:31 [monitor] 3x3/B5b_CH4_toB4_fromB2 验收通过（E0 -353.71444, Fmax_free 0.0186, Ce³⁺ 4 ↑↑↑↑ C–H 4）
+3x3/B11_ref_fromB5b 1535018: B parent on the B5b registry (layer slid 0.65 A, B5b 0.262 eV below B2); start: B5b WAVECAR, ICHARG 0, ALGO Normal
+2026-11-10T14:51:41 [monitor] 3x3/B11_ref_fromB5b 1535018: B parent on the B5b registry (layer slid 0.65 A, B5b 0.262 eV below B2); start: B5b WAVECAR, ICHARG 0, ALGO Normal
+3x3/B11b_ref_fromB0 1535019: same POSCAR as B11, backup start from the old B0 WAVECAR+CHGCAR (ICHARG 1)
+2026-11-10T14:51:41 [monitor] 3x3/B11b_ref_fromB0 1535019: same POSCAR as B11, backup start from the old B0 WAVECAR+CHGCAR (ICHARG 1)
+3x3/B12_CH3Os_HOs_fromB5b 1535020: B4 shifted (-0.428, +0.498, 0) A onto the B5b registry; start: B5b WAVECAR+CHGCAR
+2026-11-10T14:51:41 [monitor] 3x3/B12_CH3Os_HOs_fromB5b 1535020: B4 shifted (-0.428, +0.498, 0) A onto the B5b registry; start: B5b WAVECAR+CHGCAR
+neb_3x3/A_neb 1535023: resume from image CONTCARs (1523636 watchdog stop at 148 steps, not converged, Fmax 0.083)
+2026-11-10T14:51:41 [monitor] neb_3x3/A_neb 1535023: resume from image CONTCARs (1523636 watchdog stop at 148 steps, not converged, Fmax 0.083)
+neb_3x3/C_neb 1535024: 1525494 killed by /scratch full (ENOSPC) at 197 steps; CONTCAR -> POSCAR, NEB only (no stage A, user 11-09), ISTART 0 / MAGMOM Ce 1
+2026-11-10T14:51:41 [monitor] neb_3x3/C_neb 1535024: 1525494 killed by /scratch full (ENOSPC) at 197 steps; CONTCAR -> POSCAR, NEB only (no stage A, user 11-09), ISTART 0 / MAGMOM Ce 1
+neb_3x3/D_neb 1535025: path rebuilt (build_neb_D_two_keyframes_20261109.py): H abstraction by O38 (image 02 C-H 1.30, O-H 1.15), CH3 rotates and rebinds O40 (image 05 C-O40 2.05); stage A on the images, then NEB
+2026-11-10T14:51:41 [monitor] neb_3x3/D_neb 1535025: path rebuilt (build_neb_D_two_keyframes_20261109.py): H abstraction by O38 (image 02 C-H 1.30, O-H 1.15), CH3 rotates and rebinds O40 (image 05 C-O40 2.05); stage A on the images, then NEB
+3x3/D8_CH3Ce_HOs 1535026: r4 (FIRE) killed by /scratch full at step 168 (E0 -349.4495); CONTCAR -> POSCAR, stageB_relax_r5 (FIRE)
+2026-11-10T14:51:41 [monitor] 3x3/D8_CH3Ce_HOs 1535026: r4 (FIRE) killed by /scratch full at step 168 (E0 -349.4495); CONTCAR -> POSCAR, stageB_relax_r5 (FIRE)
+2026-11-10T14:55:14 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-10T14:57:05 [claude] neb_3x3/C_neb: qdel 1525494 - PBS requeued the original NEB C job after the outage (run_count 2, start 14:41) in the same directory as the resume job 1535024; 1535024 keeps running (its own OUTCAR since 14:52, the requeued run output is in OUTCAR_run1/OSZICAR_run1)
+2026-11-10T15:21:42 [claude] neb_3x3/D_neb 1535025 qdel (user 11-10 "停掉并重建"): D9 -> D7 is C-H cleavage + CH3 crossing Ce13 to O40, and D7 sits on a D1/D10 hybrid cluster; folder -> neb_3x3/D_neb_run2_keyframe_1535025
+3x3/D11_CH3Ce_HO38_fromD9 1535058.stdct-mgmt-02: D9 with only H45 moved onto O38 (first C-H cleavage FS on the D10 cluster); D9 WAVECAR, ICHARG 0; stageB_relax only
+3x3/D12_CH3O40_HO38_onD10 1535059.stdct-mgmt-02: D7 CH3O* + OH* on the D10 cluster (replaces D7); D7 WAVECAR+CHGCAR, ICHARG 1; stageB_relax only
+2026-11-10T15:24:02 [claude-cli] 3x3/B5_CH4_toB4 1527073 结束、Ce³⁺ 2≠4：不重算。从正确态 WAVECAR 重算即 11-07 的 B5b_CH4_toB4_fromB2（B2 WAVECAR，11-08 验收 Ce³⁺ 4），且 B 已换到 B11/B12 新层位置；B5 加入监控 RETIRED，目录原样保留
+2026-11-10T16:09:34 [claude] 3x3/B13_CH3_HO45_fromB5b 1535330.stdct-mgmt-02: user 11-10 "重建 B 末态". dist.pl B5b->B12 8.53 A (H-matched 7.92, C lateral 3.96 A: CH3 migration to O40) -> new first C-H cleavage FS = B5b with only H50 moved onto O45 (dist.pl B5b->B13 2.24 A); B5b WAVECAR+CHGCAR, ICHARG 1, INCAR as B12; stageB_relax only. NEB B = B5b -> B13 (IDPP via build_neb.py after acceptance); B12 kept as the CH3O*+OH* state
+2026-11-10T16:22:47 [claude] qdel 3x3/D8_CH3Ce_HOs 1535026 (r5, on the old D1 cluster, not on the NEB path) and 3x3/B11b_ref_fromB0 1535019 (backup start of B11) - user 11-10 "停掉让位": free the 6-job batch_cpu limit for B13 1535330 and D11 1535058
+2026-11-10T16:25:20 [claude] 3x3/D12_CH3O40_HO38_onD10: PBS started D12 1535059 instead of B13; qdel after 1 min (no ionic step, WAVECAR/CHGCAR untouched) and resubmitted unchanged as 1535461.stdct-mgmt-02 so B13 1535330 takes the free slot
+2026-11-10T20:23:16 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-10T20:25:12 [claude-cli] NELM 条目核对：B11 1535018 第 1 步 SCF 300 后第 2 步 94 步收敛、第 3 步在跑；D11 1535058 第 2 步 SCF 14 步 dE 6e-3→2e-3 收敛中；均不续算。NEB A 1535023 普通 NEB 收敛：像间距 0.83–0.88 Å 均匀，断裂 C–H 1.10→1.29(05)→2.19(06)→2.53 Å，H–H min ≥1.68 Å，Rh 最大位移 0.24 Å（仅 06/07 末态处），全像 |m|≈0；最高像 05 +0.623 eV，路径可上 CI-NEB，待用户决定。
+2026-11-10T22:55:00+08:00 [codex] status inspection and monitor run: no job mutations; A ordinary NEB converged Fmax=0.047042 highest=0.6229eV dE=0.2642eV awaiting path review; C running 1 ionic step high forces and energies, unvalidated; B11/B12/B13/D11/D12 running.
+2026-11-11 01:24 [claude-cli] 接手核查：余额 0 为 amgr 会话过期误读；刷新后 CFP04-CF-046 余额 7312574.7 CPU h；6 个作业全部 R（1535018/020/024/058/330/461），无排队，未动作业。
+2026-11-11T06:23:22 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-11T06:23:24 [monitor] 3x3/B11_ref_fromB5b 验收通过（E0 -329.56571, Fmax_free 0.0146, Ce³⁺ 4 ↓↑↓↓ ）
+2026-11-11T10:02:27 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-11T10:02:29 [monitor] 3x3/D12_CH3O40_HO38_onD10 验收通过（E0 -352.32845, Fmax_free 0.0163, Ce³⁺ 4（↑4↓0）/14 C–H 3）
+2026-11-11T10:55:53 [claude] neb_3x3/A_cineb 1539627.stdct-mgmt-02: CI-NEB A1 -> A2 (user 11-11 "补好并提交"); from the converged ordinary NEB 1535023 (Fmax 0.047, highest image 05 +0.623 eV); 01-06 POSCAR = ordinary CONTCAR, own WAVECARs, ISTART 1 / ICHARG 0, LCLIMB .TRUE., rest as the ordinary INCAR; dist.pl 00-07 4.493 A, spacing 0.828-0.884 A
+2026-11-11T11:23:11 [monitor] 3x3/D11_CH3Ce_HO38_fromD9 验收通过（E0 -350.20456, Fmax_free 0.0182, Ce³⁺ 3（↑2↓1）/14 C–H 3）
+2026-11-11T11:29:02 [claude-cli] neb_3x3/D_neb 1539734.stdct-mgmt-02: ordinary NEB D9_CH4_toD7 -> D11_CH3Ce_HO38_fromD9 (PLAN s11 / 12.v), build_neb.py --pair (IDPP, 6 images, no hand keyframes), no stage A, ISTART 0 / ICHARG 2, MAGMOM 14*1 32*0, LCLIMB .FALSE.; dist.pl raw 1.759 A = H-matched 00-07 1.759 A, spacing 0.251 A x7; movers H45 1.56 / O38 0.49 / Ce13 0.32 A; C lateral 0.20 A; breaking C-H45 points at O38 (24 deg), C-H45 1.10->2.84, O38-H 2.85->0.97, other C-H 1.07-1.10, H-H min 1.78 A
+2026-11-11T11:29:02 [claude-cli] neb_3x3/A_cineb: 1539627 held by PBS (Hold s, Exit -3, run_count 21 too many failed attempts, never started; qrls -h s refused) -> qdel and resubmitted unchanged job_neb.pbs as 1539729 (R on CN-065/CN-041 at 11:26)
+2026-11-11T11:31:12 [claude-cli] monitor: NEB3 += D (1539734), A_ci -> 1539729, state.json synced (bak_20261111_nebD); neb_report now raises ATTENTION for a held NEB job (PBS too many failed attempts)
+2026-11-11T16:09:25 [claude] 3x3/D13_CH3onCe13_HO38_fromD11 1541115.stdct-mgmt-02: test whether CH3*(Ce13) exists on model D (user 11-11 "建并提交测试"); from accepted D11 CONTCAR, CH3 moved to C-Ce13 2.55 A in the open pocket above Ce13 (nearest O39 2.82 A), pyramidal C-H 1.10 A, umbrella away from Ce; H45 on O38 and slab unchanged; INCAR/KPOINTS/POTCAR/job as D11 (ISTART 1 / ICHARG 0 with D11 WAVECAR); script build_D13_CH3onCe13_20261111.py
+2026-11-11T16:23:11 [monitor] 3x3/B12_CH3Os_HOs_fromB5b 验收通过（E0 -353.10350, Fmax_free 0.0158, Ce³⁺ 4 ↑↑↑↑ C–H 3）
+2026-11-11T19:34:48 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-12T12:56:46 [monitor] 3x3/D13_CH3onCe13_HO38_fromD11 验收通过（E0 -350.20574, Fmax_free 0.0182, Ce³⁺ 3（↑2↓1）/14 C–H 3）
+
+2026-11-12 13:10 qdel 1535330 (3x3/B13_CH3_HO45_fromB5b): user "停掉 B13". After 266 ionic steps CH3 and the H on O45 recombined to CH4 (C-H 4, E0 -353.517 eV, B5b +0.20 eV); B13 is not a stable final state. Monitor: B13 in RETIRED, NEB_NEXT B removed. Outputs kept in place.
+
+2026-11-12 qsub 1546187 (3x3/B14_CH3O43_HO45_fromB5b, s73_B14_CH3O43, CFP04-CF-046, 72 h): user "提交 B14". New B final state after B13 recombined to CH4: B12 motif (CH3O* + OH*) placed under the B5b CH4, CH3 on O43 (C-O 1.43 A), H50 on O45 (0.98 A), slab and CH3 umbrella from B5b. dist.pl B5b -> B14 6.30 A (B5b -> B12 9.14 A). INCAR = B13 (ISTART 1 / ICHARG 1, ISMEAR 1 / SIGMA 0.10, no MAGMOM), stageB_relax only, B5b WAVECAR + CHGCAR. Monitor: SYSTEMS3 + B14, NEB_NEXT B = B5b -> B14.
+
+2026-11-12 qdel 1539734 (NEB D, D9_CH4_toD7 -> D11_CH3Ce_HO38_fromD9): user "D的普通neb就不用跑了". 2 ionic steps in ~25 h; outputs kept in neb_3x3/D_neb. Monitor: D removed from NEB3 and NEB_NEXT.
+2026-11-12T17:23:48 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-12T17:24:43 [claude-cli] CI-NEB A (1539729) converged rc=0, 53 steps, all images Fmax <= 0.049 eV/A. Climbing image 05: E_a = +0.714 eV vs 00 (ordinary NEB 0.623), dE = +0.264 eV. Image 05 geometry: C-H(break) 1.552 A, C-Rh 2.201 A, H-Rh 1.648 A (oxidative addition over one Rh atop); path continuous (C-H 1.099->1.102->1.106->1.115->1.141->1.552->2.311->2.527), min H-H >= 1.74 A, |mag| < 0.001 all images (A has no Ce). No resubmission. Next: frequency check of image 05 awaits user approval.
+2026-11-12T22:23:28 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-13T03:23:31 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-13T08:23:14 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-13T08:23:16 [monitor] 3x3/B14_CH3O43_HO45_fromB5b 验收通过（E0 -353.39911, Fmax_free 0.0183, Ce³⁺ 4 ↑↑↑↑ C–H 3）
+2026-11-13T08:26:05 [claude-cli] neb_3x3/B_neb 1550784.stdct-mgmt-02 (s7neb_B_B5bB14, Q): ordinary NEB B5b_CH4_toB4_fromB2 -> B14_CH3O43_HO45_fromB5b (PLAN s11), build_neb.py --pair (IDPP, 6 images, no hand keyframes), no stage A (STAGEA_DONE), ISTART 0 / ICHARG 2, MAGMOM 36*0 4*1 11*0, LCLIMB .FALSE.; POTCAR from B5b (= B14), 00/07 OUTCAR = endpoint OUTCAR_stageB_relax. dist.pl raw 5.682 A = H-matched 00-07 5.682 A, spacing 0.812 A x7; movers C46 2.70, H47 2.66, H48 2.65, H50 2.34, H49 2.18, O43 0.49 A, slab max 0.49 A; C lateral 1.94 A, vertical -1.88 A. Breaking C-H50 points at O45 (21 deg); C-H50 1.10->1.48->1.90->2.34->2.80->3.29->3.78->3.87, O45-H 3.22->0.97, C-O43 4.25->1.42; other C-H 1.07-1.11, H-H min 1.70 A, no jumps. Monitor: NEB3 += B (1550784), NEB_NEXT -= B; state.json neb.B synced (bak_20261113_nebB). Check script next_steps/neb_3x3/check_B_neb_20261113.py.
+2026-11-13T10:55:57 [claude] neb_3x3/A_cineb_freq05 1551032.stdct-mgmt-02 (s7f_A05_freq, Q): frequency check of CI-NEB A climbing image 05 (user approved 2026-11-13). POSCAR = A_cineb/05/CONTCAR, C + 4H displaced (T), 36 Rh fixed; IBRION 5, NFREE 2, POTIM 0.015, NSW 1, EDIFF 1E-7; physics as CI-NEB (PBE, ENCUT 450, ISPIN 2, ISMEAR 1/0.10, k 4x4x1); ISTART 1 from 05/WAVECAR; 1 node 36 cores, 72 h, LABORT watchdog 250200 s. Expect exactly one imaginary mode along the breaking C-H.
+2026-11-13T13:23:19 [monitor] NEB C 自动续算 r1：未收敛（117 步），各像 CONTCAR → POSCAR，新作业 1551449
+neb_3x3/C_neb 1551449.stdct-mgmt-02 auto_resume_r1_CONTCAR_to_POSCAR (monitor, 2026-11-13)
+2026-11-13T17:52:00 [codex] A_cineb_freq05 1551032 completed Exit=0 walltime=02:36:35; 30/30 displacements; 3 imaginary modes 42.098i,85.501i,925.394i cm-1. Strong mode involves breaking H/C-H; single-imaginary-mode acceptance pending low-mode diagnosis. B 1550784 R ~8h first SCF; C resume 1551449 Q ncpus. Read-only audit, no new submission.
+2026-11-13T18:23:54 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-13T23:23:42 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-13T23:24:17 [claude-cli] 自动接手：qstat 连不上 PBS 服务器 stdct-mgmt-02（Connection refused, errno 15010），属集群侧故障；B_neb、C_neb OSZICAR 仍在 0–7 min 内更新，计算未受影响。只报告，无操作。
+2026-11-14T04:23:14 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-14T04:23:51 [claude-cli] 自动接手：qstat 仍连不上 PBS 服务器 stdct-mgmt-02（Connection refused, errno 15010），集群侧故障；B_neb 06、C_neb 06 OSZICAR 在 04:21–04:23 更新，计算照常进行。只报告，无操作。
+2026-11-14T09:23:14 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-14 09:23:40 [claude-cli] PBS 服务器 stdct-mgmt-02 拒绝连接（qstat errno 15010）；B_neb、C_neb 的 OSZICAR 一小时内仍在更新，计算节点照常运行。无法查队列，不做操作，等 PBS 恢复后脚本照常检查。
+2026-11-14T12:29:00 [claude] neb_3x3/B_neb 1553237.stdct-mgmt-02 (s7neb_B_B5bB14): user 2026-11-13 "重投一下" - qdel 1550784 (13 h, no ionic step: images 01-04 hit NELM 300 unconverged, 05/06 still in SCF); same images (POSCAR unchanged, outputs kept as *_before_r1_algoNormal), same physics, only ALGO Normal -> All (INCAR_before_r1_algoNormal kept); ISTART 0 / ICHARG 2, MAGMOM 36*0 4*1 11*0, no stage A.
+2026-11-14T14:23:29 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-14T19:38:33 [claude-cli] 自动接手：PBS 服务器无响应（qstat 超时）且 hpc project 超时；C_neb 1551449 照常写出。B_neb 1553237 自 17:21 起无输出、首个离子步未完成，判定卡死。已在 stdct-login-01 后台挂 neb_3x3/B_neb/restart_r2_seedWAVECAR_20261114.sh：PBS 恢复后若作业仍在写则不动，否则 qdel 并按 r2（各像读端点 WAVECAR+CHGCAR，ALGO Normal，NBANDS 276）原样重投，回写 state.json。
+2026-11-14T21:21:50 [claude-cli] neb_3x3/B_neb r2 1555150.stdct-mgmt-02 (s7neb_B_B5bB14): 1553237 (ALGO All, ISTART 0) stalled - OSZICAR frozen since 11-14 17:21 in the first ionic step (01/03/04 NELM 300 unconverged, 05/06 CGA diverging), PBS was down; qdel/ended -> same IDPP images (POSCAR unchanged; outputs kept as *_before_r2_algoAll), images 01-03 read B5b WAVECAR+CHGCAR, 04-06 read B14 WAVECAR+CHGCAR, ISTART 1 / ICHARG 1, ALGO Normal, NBANDS 276 (endpoint value); ENCUT/U/ISPIN/MAGMOM/k/smearing/EDIFFG unchanged, no stage A (INCAR_before_r2_algoAll kept).
+2026-11-14T22:11:00 [claude] neb_3x3/C_neb 1551449: PBS requeue (run_count 3) restarted from 11-13 POSCAR; image CONTCARs of the lost run (11-14 ~12:00) copied to */CONTCAR_lost_run_20261114 before they are overwritten. No change to the running job.
+2026-11-15T00:12:00+08:00 [codex] Read-only audit: B 1555150 R, 2 ionic steps completed, SCF now progressing; current early profile max +5.824 eV/Fmax4.622 not a barrier. C 1551449 R/run_count3 after PBS requeue, first SCF100-123, no ionic step; six lost-run CONTCAR backups confirmed. A CI maxF0.049174/Ea0.7141/dE0.2642, frequency has 3 imaginary modes (42.098,85.501,925.394 cm-1), distinguish CI convergence from strict single-mode validation. Notion lessons reviewed; no job/input changes.
+2026-11-15 00:25 [claude-cli] 接手：hpc project 额度条目复查——~/hpc_login.sh 重新刷新后 CFP04-CF-046 可读（余 7118532 CPU h）；在跑 1551449 s7neb_C、1555150 s7neb_B 均 R，无需操作。
+2026-11-15T05:24:36 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-15T10:23:14 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-15T20:23:33 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-16T06:23:14 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+2026-11-17T22:43:13 [monitor] NEB C 自动续算 r2：未收敛（35 步），各像 CONTCAR → POSCAR，新作业 1580814
+neb_3x3/C_neb 1580814.stdct-mgmt-02 auto_resume_r2_CONTCAR_to_POSCAR (monitor, 2026-11-17)
+2026-11-17T22:43:17 [monitor] NEB B 自动续算 r3：未收敛（188 步），各像 CONTCAR → POSCAR，新作业 1580815
+neb_3x3/B_neb 1580815.stdct-mgmt-02 auto_resume_r3_CONTCAR_to_POSCAR (monitor, 2026-11-17)
+2026-11-18T20:28:22 [monitor] hpc project 未返回 CFP04-CF-046 额度，已用 ~/hpc_login.sh 静默刷新 amgr 会话，刷新后正常
+neb_3x3/C_neb 2026-11-18 INCAR_neb+INCAR ISTART 0->1 ICHARG 2->0 for next resume (read WAVECAR; same physics; running 1580814 untouched; backups *.istart0_before_20261118); monitor neb_resume patched likewise (claude, user-approved)

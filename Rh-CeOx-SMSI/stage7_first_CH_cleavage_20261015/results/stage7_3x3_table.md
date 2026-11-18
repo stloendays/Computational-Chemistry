@@ -1,3 +1,5 @@
+# Stage 7（3×3 / CeO₂ p(2×2)）首次 C–H 断裂端点（2026-11-18 20:28）
+
 | 体系 | 类型 | E0 (eV) | E − E(ref) − E(CH₄,g) (eV) | 相对本模型最稳 CH₄ 态 (eV) | Fmax_free | Ce 磁矩 | 备注 |
 |---|---|---|---|---|---|---|---|
 | A0_ref | ref | -247.32369 | — | — | 0.010 | Rh|m|max 0.01 | — |
@@ -20,11 +22,19 @@
 | D6_CH3Ce_HOc | dis | -349.96899 | +1.120 | +1.181 | 0.019 | Ce³⁺ 3（↑2↓1）/14 | C–H 3 |
 | D7_CH3Oc_HOc | dis | -352.32810 | -1.239 | -1.178 | 0.016 | Ce³⁺ 4（↑4↓0）/14 | C–H 3 |
 | D8_CH3Ce_HOs | dis | — | — | — | — | — | — |
-| B5_CH4_toB4 | ch4 | -352.60983 | — | +1.105 | 0.015 | Ce³⁺ 2 ↑00↑ | C–H 4 |
+| B5_CH4_toB4 | ch4 | -352.60983 | +0.993 | +1.105 | 0.015 | Ce³⁺ 2 ↑00↑ | C–H 4 |
 | C9_CH3perimRh_HOp | dis | -309.37819 | +0.469 | +0.605 | 0.015 | Ce³⁺ 2 ↑↑ | C–H 3 |
 | C10_CH4_toC9 | ch4 | -309.93514 | -0.088 | +0.048 | 0.019 | Ce³⁺ 2 ↑↑ | C–H 4 |
 | D9_CH4_toD7 | ch4 | -351.14990 | -0.061 | +0.000 | 0.020 | Ce³⁺ 2（↑2↓0）/14 | C–H 4 |
 | D10_ref_D9cluster | ref | -327.05190 | — | — | 0.020 | Ce³⁺ 2（↑2↓0）/14 | — |
-| B5b_CH4_toB4_fromB2 | ch4 | -353.71444 | — | +0.000 | 0.019 | Ce³⁺ 4 ↑↑↑↑ | C–H 4 |
+| B5b_CH4_toB4_fromB2 | ch4 | -353.71444 | -0.112 | +0.000 | 0.019 | Ce³⁺ 4 ↑↑↑↑ | C–H 4 |
+| B11_ref_fromB5b | ref | -329.56571 | — | — | 0.015 | Ce³⁺ 4 ↓↑↓↓ | — |
+| B11b_ref_fromB0 | sup | — | — | — | — | — | — |
+| B12_CH3Os_HOs_fromB5b | dis | -353.10350 | +0.499 | +0.611 | 0.016 | Ce³⁺ 4 ↑↑↑↑ | C–H 3 |
+| D11_CH3Ce_HO38_fromD9 | dis | -350.20456 | +0.885 | +0.945 | 0.018 | Ce³⁺ 3（↑2↓1）/14 | C–H 3 |
+| D12_CH3O40_HO38_onD10 | dis | -352.32845 | -1.239 | -1.179 | 0.016 | Ce³⁺ 4（↑4↓0）/14 | C–H 3 |
+| D13_CH3onCe13_HO38_fromD11 | dis | -350.20574 | +0.883 | +0.944 | 0.018 | Ce³⁺ 3（↑2↓1）/14 | C–H 3 |
+| B13_CH3_HO45_fromB5b | dis | — | — | — | — | — | — |
+| B14_CH3O43_HO45_fromB5b | dis | -353.39911 | +0.204 | +0.315 | 0.018 | Ce³⁺ 4 ↑↑↑↑ | C–H 3 |
 
-E0 = energy(sigma->0) of the converged relaxation (OUTCAR_stageB_relax*, ISMEAR 1, SIGMA 0.10); G_CH4 = the stage-7 CH₄ box. 24/26 已验收。
+E0 = energy(sigma->0) of the converged relaxation (OUTCAR_stageB_relax*, ISMEAR 1, SIGMA 0.10); G_CH4 = the stage-7 CH₄ box. 30/34 已验收。

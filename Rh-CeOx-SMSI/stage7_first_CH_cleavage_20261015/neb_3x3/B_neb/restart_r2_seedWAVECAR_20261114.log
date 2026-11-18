@@ -1,0 +1,18 @@
+2026-11-14_21:19:54 PBS back
+
+stdct-mgmt-02: 
+                                                            Req'd  Req'd   Elap
+Job ID          Username Queue    Jobname    SessID NDS TSK Memory Time  S Time
+--------------- -------- -------- ---------- ------ --- --- ------ ----- - -----
+1551449.stdct-* junboto* batch_c* s7neb_C_C* 979703   2  72  500gb 72:00 Q   -- 
+1553237.stdct-* junboto* batch_c* s7neb_B_B* 24934*   2  72  500gb 72:00 Q   -- 
+2026-11-14_21:19:56 job 1553237 state=Q newest OSZICAR age 14432s
+2026-11-14_21:20:10 qdel 1553237
+2026-11-14_21:21:50 qsub 1555150.stdct-mgmt-02
+
+stdct-mgmt-02: 
+                                                            Req'd  Req'd   Elap
+Job ID          Username Queue    Jobname    SessID NDS TSK Memory Time  S Time
+--------------- -------- -------- ---------- ------ --- --- ------ ----- - -----
+1551449.stdct-* junboto* batch_c* s7neb_C_C* 16124*   2  72  500gb 72:00 R 00:01
+1555150.stdct-* junboto* batch_c* s7neb_B_B*    --    2  72  500gb 72:00 Q   -- 
