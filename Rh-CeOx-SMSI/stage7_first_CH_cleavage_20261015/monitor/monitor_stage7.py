@@ -1034,7 +1034,9 @@ def neb_resume(m, d, st, o, nstep):
     # 2026-11-20 (user "改读C端点的 WAVECAR"): one-shot flag RESEED_ENDPOINT_WAVECAR in the NEB folder. All C images had
     # fallen to 0 Ce3+ (endpoints 2): image 01, an intact CH4 moved 0.4 A, sat +1.69 eV above C10. Images 01-03 then
     # start from the IS WAVECAR, 04-06 from the FS WAVECAR (as B r2, 11-14), NBANDS = the endpoint value, ISTART 1 /
-    # ICHARG 0; geometry = the image CONTCARs, physics unchanged. Old image WAVECARs kept as WAVECAR_before_rN.
+    # ICHARG 1 with the endpoint CHGCAR too; geometry = the image CONTCARs, physics unchanged. Old image WAVECARs kept
+    # as WAVECAR_before_rN. 11-20: the WAVECAR-only seed (ICHARG 0, 1595966) failed as on 10-26 - 10 h without an
+    # ionic step, far images diverging - while WAVECAR+CHGCAR (ICHARG 1, B r2) worked.
     flag = os.path.join(d, 'RESEED_ENDPOINT_WAVECAR')
     reseed = ''
     if os.path.exists(flag):
@@ -1044,13 +1046,15 @@ def neb_resume(m, d, st, o, nstep):
         for e in (ini, fin):
             mm = re.search(r'NBANDS=\s*(\d+)', sh("grep -m1 'NBANDS=' OUTCAR", cwd=os.path.join(IN3, e))[1])
             nb.add(mm.group(1) if mm else None)
-        if None in nb or len(nb) != 1 or any(not os.path.exists(os.path.join(v, 'WAVECAR')) for v in src.values()):
-            st['resume_why'] = '端点 WAVECAR 播种失败：端点 NBANDS %s 或 WAVECAR 缺失' % sorted(map(str, nb))
+        if None in nb or len(nb) != 1 or any(not os.path.exists(os.path.join(v, f)) for v in src.values()
+                                                  for f in ('WAVECAR', 'CHGCAR')):
+            st['resume_why'] = '端点 WAVECAR 播种失败：端点 NBANDS %s 或 WAVECAR/CHGCAR 缺失' % sorted(map(str, nb))
             return None
         nb = nb.pop()
         for i in imgs:
-            rc, out = sh('[ -e WAVECAR ] && mv WAVECAR WAVECAR_before_r%d; cp %s/WAVECAR WAVECAR && '
-                         'cmp -n 1048576 WAVECAR %s/WAVECAR' % (n, src[i], src[i]), cwd=os.path.join(d, i), timeout=900)
+            rc, out = sh('[ -e WAVECAR ] && mv WAVECAR WAVECAR_before_r%d; [ -e CHGCAR ] && mv CHGCAR CHGCAR_before_r%d; '
+                         'cp %s/WAVECAR %s/CHGCAR . && cmp -n 1048576 WAVECAR %s/WAVECAR && cmp CHGCAR %s/CHGCAR'
+                         % (n, n, src[i], src[i], src[i], src[i]), cwd=os.path.join(d, i), timeout=900)
             if rc != 0:
                 st['resume_why'] = '端点 WAVECAR 复制失败（%s）：%s' % (i, out[:100])
                 return None
@@ -1060,7 +1064,7 @@ def neb_resume(m, d, st, o, nstep):
                 continue
             inc = read(p)
             new_inc = re.sub(r'^ISTART = .*$', 'ISTART = 1', inc, flags=re.M)
-            new_inc = re.sub(r'^ICHARG = .*$', 'ICHARG = 0', new_inc, flags=re.M)
+            new_inc = re.sub(r'^ICHARG = .*$', 'ICHARG = 1', new_inc, flags=re.M)
             if re.search(r'^NBANDS = ', new_inc, flags=re.M):
                 new_inc = re.sub(r'^NBANDS = .*$', 'NBANDS = %s' % nb, new_inc, flags=re.M)
             else:
@@ -1068,7 +1072,7 @@ def neb_resume(m, d, st, o, nstep):
             sh('cp -p %s %s.before_reseed_r%d' % (name, name, n), cwd=d)
             write(p, new_inc)
         os.rename(flag, flag + '.done_r%d' % n)
-        reseed = '，01–03 读 %s、04–06 读 %s 的 WAVECAR，NBANDS %s，ISTART 1 / ICHARG 0' % (ini, fin, nb)
+        reseed = '，01–03 读 %s、04–06 读 %s 的 WAVECAR+CHGCAR，NBANDS %s，ISTART 1 / ICHARG 1' % (ini, fin, nb)
     # 2026-11-18 (user): a resume reads every image's WAVECAR. C_neb restarted from scratch (ISTART 0 / ICHARG 2,
     # rewritten from INCAR_neb by job_neb.pbs each run) and burnt NELM = 300 on 5 of 6 images per restart.
     # Same physics; ICHARG 1 (B, CHGCAR start) is left alone.
