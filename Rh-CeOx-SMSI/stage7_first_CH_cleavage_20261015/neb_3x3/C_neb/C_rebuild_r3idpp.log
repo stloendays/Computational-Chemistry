@@ -1,0 +1,24 @@
+01 <- C10_CH4_toC9
+02 <- C10_CH4_toC9
+03 <- C10_CH4_toC9
+04 <- C9_CH3perimRh_HOp
+05 <- C9_CH3perimRh_HOp
+06 <- C9_CH3perimRh_HOp
+== INCAR diff vs archived INCAR_neb
+20,21c20,21
+< ISTART = 0
+< ICHARG = 2
+---
+> ISTART = 1
+> ICHARG = 1
+43c43,44
+< MAGMOM = 36*0 2*1 8*0
+---
+> NBANDS = 249
+> MAGMOM = 36*0 2*1 3*0 1*0 4*0
+dist.pl 00-07 5.789; spacing 0.827 0.827 0.827 0.827 0.827 0.829 0.837
+submitted 1598834.stdct-mgmt-02
+Job ID          Username Queue    Jobname    SessID NDS TSK Memory Time  S Time
+--------------- -------- -------- ---------- ------ --- --- ------ ----- - -----
+1598628.stdct-* junboto* auto_fr* s7mon         --    1   1    4gb 02:00 W   -- 
+1598834.stdct-* junboto* batch_c* s7neb_C_C*    --    2  72  500gb 72:00 Q   -- 
