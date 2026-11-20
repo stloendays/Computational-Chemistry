@@ -35,7 +35,7 @@
 | 计算节点上没有 `hpc` 命令，查不了额度和配额 | 探针 1595612：`hpc: command not found` | 监控通过 ssh 回登录节点跑 |
 | 计算节点可以 qsub，也能免密 ssh 回登录节点 | 探针 1595591 的子作业 1595610 跑完（`child.out`）；1595612 里 `ssh stdct-login-01` 后 `hpc project` 正常 | 续投和续算都在服务器内部完成 |
 | 计算节点上有 python3 | 3.9.18，`/bin/python3` | 不需要加载 module |
-| `hpc_login.sh` 刷新后第一次 `hpc project` 偶尔读不到额度，再刷一次就正常 | 11-20 B CI-NEB 提交前遇到一次 | 提交脚本先检查额度；续投失败时隔 2 min 重试，共 3 次 |
+| 提交脚本报"额度读不到"，其实额度正常 | 11-20 两次提交前都报错，单独跑 `hpc project` 都能读到 | 原因是脚本开了 `set -o pipefail`，又用 `hpc project \| grep -q`：grep 一匹配到就退出，`hpc` 收到 SIGPIPE，整条管道被判失败。改为先把输出存进变量，再用 grep 判断。监控脚本用 Python 正则读输出，不受影响 |
 | 本地 Windows 上写出的 .pbs 可能带 CRLF | — | 上传后执行 `sed -i 's/\r$//'`，再用 `bash -n` 检查语法 |
 
 ## 同时加入的续算功能：端点 WAVECAR 播种
