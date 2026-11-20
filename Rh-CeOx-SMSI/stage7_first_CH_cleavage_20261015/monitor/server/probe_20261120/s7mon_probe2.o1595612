@@ -1,0 +1,7 @@
+host=CN-161
+/var/spool/pbs/mom_priv/jobs/1595612.stdct-mgmt-02.SC: line 10: type: hpc: not found
+/var/spool/pbs/mom_priv/jobs/1595612.stdct-mgmt-02.SC: line 11: hpc: command not found
+/var/spool/pbs/mom_priv/jobs/1595612.stdct-mgmt-02.SC: line 12: hpc: command not found
+Authorized users only. All activity may be monitored and reported.
+stdct-login-01
+1

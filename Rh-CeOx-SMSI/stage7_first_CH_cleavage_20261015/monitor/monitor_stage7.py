@@ -158,11 +158,13 @@ NEB3 = {'A': ('neb_3x3/A_neb', '1523636', 'A1_CH4_top', 'A2_CH3top_Hfcc'),
         # 11-11 user "补好并提交": CI-NEB of A from the converged ordinary NEB 1535023 (own WAVECARs, LCLIMB .TRUE.)
         'A_ci': ('neb_3x3/A_cineb', '1539729', 'A1_CH4_top', 'A2_CH3top_Hfcc'),
         # 11-13 CLI takeover: ordinary NEB B5b -> B14 (build_neb.py --pair, IDPP, no stage A, MAGMOM Ce 1)
-        'B': ('neb_3x3/B_neb', '1550784', 'B5b_CH4_toB4_fromB2', 'B14_CH3O43_HO45_fromB5b')}
+        'B': ('neb_3x3/B_neb', '1550784', 'B5b_CH4_toB4_fromB2', 'B14_CH3O43_HO45_fromB5b'),
+        # 11-20 user "投 B 的 CI-NEB": from the converged ordinary NEB 1580815 (own WAVECARs, ISTART 1 / ICHARG 0, LCLIMB)
+        'B_ci': ('neb_3x3/B_cineb', '1595539', 'B5b_CH4_toB4_fromB2', 'B14_CH3O43_HO45_fromB5b')}
 # 11-12 user "D的普通neb就不用跑了": NEB D 1539734 (D9 -> D11) qdel'd after 2 ionic steps; no NEB for D.
 # D: runs 1526950 (IDPP) and 1535025 (hand-built keyframes) used the D7 FS -> archived as neb_3x3/D_neb_run1_1526950 and
 # D_neb_run2_keyframe_1535025 (11-10). NEB D = D9 -> D11, built with build_neb.py (IDPP) once D11 is accepted.
-NEB_CE3 = {'B': '4', 'C': '2', 'D': '2 → D11 末态的个数'}
+NEB_CE3 = {'B': '4', 'B_ci': '4', 'C': '2', 'D': '2 → D11 末态的个数'}
 # 11-12: B13 failed (recombined to CH4); B5b -> B12 needs CH3 migration (dist.pl 8.53 A), NEB B = B5b -> B14 (11-12).
 NEB_NEXT = {'C': ('C10_CH4_toC9', 'C9_CH3perimRh_HOp')}
 
@@ -1029,6 +1031,44 @@ def neb_resume(m, d, st, o, nstep):
         sh('for f in POSCAR CONTCAR OUTCAR OSZICAR; do [ -e "$f" ] && cp -p "$f" "${f}_before_r%d"; done; '
            'cp CONTCAR POSCAR' % n, cwd=os.path.join(d, i))
     sh('[ -e vasp_neb.out ] && cp -p vasp_neb.out vasp_neb.out_before_r%d; touch STAGEA_DONE' % n, cwd=d)
+    # 2026-11-20 (user "改读C端点的 WAVECAR"): one-shot flag RESEED_ENDPOINT_WAVECAR in the NEB folder. All C images had
+    # fallen to 0 Ce3+ (endpoints 2): image 01, an intact CH4 moved 0.4 A, sat +1.69 eV above C10. Images 01-03 then
+    # start from the IS WAVECAR, 04-06 from the FS WAVECAR (as B r2, 11-14), NBANDS = the endpoint value, ISTART 1 /
+    # ICHARG 0; geometry = the image CONTCARs, physics unchanged. Old image WAVECARs kept as WAVECAR_before_rN.
+    flag = os.path.join(d, 'RESEED_ENDPOINT_WAVECAR')
+    reseed = ''
+    if os.path.exists(flag):
+        ini, fin = NEB3[m][2], NEB3[m][3]
+        src = {i: os.path.join(IN3, ini if int(i) <= 3 else fin) for i in imgs}
+        nb = set()
+        for e in (ini, fin):
+            mm = re.search(r'NBANDS=\s*(\d+)', sh("grep -m1 'NBANDS=' OUTCAR", cwd=os.path.join(IN3, e))[1])
+            nb.add(mm.group(1) if mm else None)
+        if None in nb or len(nb) != 1 or any(not os.path.exists(os.path.join(v, 'WAVECAR')) for v in src.values()):
+            st['resume_why'] = '端点 WAVECAR 播种失败：端点 NBANDS %s 或 WAVECAR 缺失' % sorted(map(str, nb))
+            return None
+        nb = nb.pop()
+        for i in imgs:
+            rc, out = sh('[ -e WAVECAR ] && mv WAVECAR WAVECAR_before_r%d; cp %s/WAVECAR WAVECAR && '
+                         'cmp -n 1048576 WAVECAR %s/WAVECAR' % (n, src[i], src[i]), cwd=os.path.join(d, i), timeout=900)
+            if rc != 0:
+                st['resume_why'] = '端点 WAVECAR 复制失败（%s）：%s' % (i, out[:100])
+                return None
+        for name in ('INCAR_neb', 'INCAR'):
+            p = os.path.join(d, name)
+            if not os.path.exists(p):
+                continue
+            inc = read(p)
+            new_inc = re.sub(r'^ISTART = .*$', 'ISTART = 1', inc, flags=re.M)
+            new_inc = re.sub(r'^ICHARG = .*$', 'ICHARG = 0', new_inc, flags=re.M)
+            if re.search(r'^NBANDS = ', new_inc, flags=re.M):
+                new_inc = re.sub(r'^NBANDS = .*$', 'NBANDS = %s' % nb, new_inc, flags=re.M)
+            else:
+                new_inc = new_inc.rstrip('\n') + '\nNBANDS = %s\n' % nb
+            sh('cp -p %s %s.before_reseed_r%d' % (name, name, n), cwd=d)
+            write(p, new_inc)
+        os.rename(flag, flag + '.done_r%d' % n)
+        reseed = '，01–03 读 %s、04–06 读 %s 的 WAVECAR，NBANDS %s，ISTART 1 / ICHARG 0' % (ini, fin, nb)
     # 2026-11-18 (user): a resume reads every image's WAVECAR. C_neb restarted from scratch (ISTART 0 / ICHARG 2,
     # rewritten from INCAR_neb by job_neb.pbs each run) and burnt NELM = 300 on 5 of 6 images per restart.
     # Same physics; ICHARG 1 (B, CHGCAR start) is left alone.
@@ -1053,10 +1093,10 @@ def neb_resume(m, d, st, o, nstep):
     new = out.split('.')[0]
     st.update({'auto_n': n, 'jid': new, 'phase': 'run'})
     st.pop('resume_why', None)
-    log_action('NEB %s 自动续算 r%d：未收敛（%d 步%s），各像 CONTCAR → POSCAR，新作业 %s'
-               % (m, n, nstep, '，' + '；'.join(fatal) if fatal else '', new))
-    write_sub('neb_3x3/%s_neb %s.stdct-mgmt-02 auto_resume_r%d_CONTCAR_to_POSCAR (monitor, %s)'
-              % (m, new, n, NOW.strftime('%Y-%m-%d')))
+    log_action('NEB %s 自动续算 r%d：未收敛（%d 步%s），各像 CONTCAR → POSCAR%s，新作业 %s'
+               % (m, n, nstep, '，' + '；'.join(fatal) if fatal else '', reseed, new))
+    write_sub('%s %s.stdct-mgmt-02 auto_resume_r%d_CONTCAR_to_POSCAR%s (monitor, %s)'
+              % (os.path.relpath(d, S), new, n, '_reseed_endpoint_WAVECAR' if reseed else '', NOW.strftime('%Y-%m-%d')))
     return new
 
 

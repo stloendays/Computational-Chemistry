@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+#PBS -N s7mon_probe
+#PBS -q auto_free
+#PBS -P CFP04-CF-046
+#PBS -l select=1:ncpus=1:mem=4gb
+#PBS -l walltime=00:20:00
+#PBS -j oe
+cd "$PBS_O_WORKDIR"
+echo host=$(hostname) date=$(date)
+which python3 qstat qsub; python3 --version
+qstat -f -F json 2>&1 | head -c 80; echo; echo qstat_rc=$?
+bash "$HOME/hpc_login.sh" > /dev/null 2>&1; hpc project 2>&1 | grep -c CFP04-CF-046 | sed "s/^/alloc_lines=/"
+j=$(echo "echo child_ok \$(hostname)" | qsub -q auto_free -P CFP04-CF-046 -l select=1:ncpus=1:mem=1gb -l walltime=00:05:00 -N s7mon_child -j oe -o "$PBS_O_WORKDIR/child.out" 2>&1); echo "child_qsub=$j"

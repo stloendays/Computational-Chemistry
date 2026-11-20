@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# Server-side stage-7 monitor (user 2026-11-20: "在服务器端做一个自动续算的脚本，不需要本地电脑来做").
+# Vanda forbids crontab, so this small free job (auto_free, 1 core) runs monitor_stage7.py - the same deterministic
+# script the local scheduled task runs: checks, CONTCAR -> POSCAR resumes, qsub, records - then queues its own next run
+# with qsub -a (start no earlier than now + INTERVAL_H). The monitor's mkdir lock keeps it from overlapping a local run.
+#   stop:      touch monitor/server/STOP        (the chain ends at its next run; or qdel the waiting s7mon job)
+#   interval:  echo 3 > monitor/server/INTERVAL_H   (hours; default 5)
+#   log:       monitor/server/server_monitor.log (one line per run), last full report monitor/server/last_run.txt
+#PBS -N s7mon
+#PBS -q auto_free
+#PBS -P CFP04-CF-046
+#PBS -l select=1:ncpus=1:mem=4gb
+#PBS -l walltime=02:00:00
+#PBS -j oe
+#PBS -o /scratch/junbotong/Dynamic_SMSI_stage7_first_CH_cleavage_20261015/monitor/server/s7mon.pbs.out
+
+set -uo pipefail
+S=/scratch/junbotong/Dynamic_SMSI_stage7_first_CH_cleavage_20261015
+H=$S/monitor/server
+LOG=$H/server_monitor.log
+cd "$S"
+now () { date +%Y-%m-%dT%H:%M:%S; }
+
+# compute nodes have no `hpc` (quota and allocation checks), so the monitor runs on a login node over the cluster's
+# internal ssh (probe 1595612, 11-20); only if no login node answers does it run here (quota gate then skipped).
+RC=255
+for L in stdct-login-01 stdct-login-02; do
+  timeout 3000 ssh -o BatchMode=yes -o ConnectTimeout=30 -o StrictHostKeyChecking=no "$L" \
+    "cd $S && python3 monitor/monitor_stage7.py" > "$H/last_run.txt" 2>&1
+  RC=$?
+  grep -q '^===FLAGS===' "$H/last_run.txt" && break
+done
+if ! grep -q '^===FLAGS===' "$H/last_run.txt"; then
+  echo "$(now) no login node answered (rc=$RC); running on $(hostname)" >> "$LOG"
+  python3 monitor/monitor_stage7.py > "$H/last_run.txt" 2>&1
+  RC=$?
+fi
+ATT=$(grep -m1 '^ATTENTION=' "$H/last_run.txt" | cut -d= -f2)
+DONE=$(grep -m1 '^DONE=' "$H/last_run.txt" | cut -d= -f2)
+ACT=$(sed -n '/^===ACTIONS===/,/^===ATTN===/p' "$H/last_run.txt" | grep -v '^===' | tr '\n' ' ' | cut -c1-300)
+echo "$(now) job=${PBS_JOBID:-manual} rc=$RC attention=${ATT:-?} done=${DONE:-?} actions: ${ACT:-none}" >> "$LOG"
+
+# queue the next run unless stopped / finished / already queued
+if [ -e "$H/STOP" ]; then echo "$(now) STOP present: chain ended" >> "$LOG"; exit 0; fi
+if [ "${DONE:-0}" = "1" ]; then echo "$(now) monitor reports DONE: chain ended" >> "$LOG"; exit 0; fi
+MINE=${PBS_JOBID%%.*}
+if qselect -u "$USER" -N s7mon -s QWHT 2>/dev/null | grep -v "^$MINE\." | grep -q .; then
+  echo "$(now) another s7mon job already queued: not resubmitting" >> "$LOG"; exit 0
+fi
+IV=$(cat "$H/INTERVAL_H" 2>/dev/null || echo 5); IV=${IV%%.*}; [ "${IV:-0}" -ge 1 ] 2>/dev/null || IV=5
+AT=$(date -d "+${IV} hours" +%Y%m%d%H%M)
+bash "$HOME/hpc_login.sh" > /dev/null 2>&1
+for try in 1 2 3; do
+  J=$(qsub -a "$AT" "$H/server_monitor.pbs" 2>&1) && { echo "$(now) next run $J at $AT" >> "$LOG"; exit 0; }
+  sleep 120
+done
+echo "$(now) RESUBMIT FAILED: $J" >> "$LOG"
+exit 1

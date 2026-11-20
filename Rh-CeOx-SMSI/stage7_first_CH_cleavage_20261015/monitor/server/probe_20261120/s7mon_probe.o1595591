@@ -1,0 +1,12 @@
+host=CN-161 date=Fri Nov 20 09:22:16 AM +08 2026
+/bin/python3
+/opt/pbs/bin/qstat
+/opt/pbs/bin/qsub
+Python 3.9.18
+{
+    "timestamp": 1795137736,
+    "pbs_version": "2026.0.0.20250926080934",
+   
+qstat_rc=0
+alloc_lines=0
+child_qsub=1595610.stdct-mgmt-02

@@ -1,0 +1,29 @@
+== INCAR diff vs ordinary
+1c1
+< SYSTEM = Stage-7 ordinary NEB B: B5b_CH4_toB4_fromB2 -> B14_CH3O43_HO45_fromB5b
+---
+> SYSTEM = Stage-7 CI-NEB B: B5b_CH4_toB4_fromB2 -> B14_CH3O43_HO45_fromB5b
+21c21
+< ICHARG = 1
+---
+> ICHARG = 0
+41c41
+< LCLIMB = .FALSE.
+---
+> LCLIMB = .TRUE.
+== job diff vs A_ci
+2c2
+< #PBS -N s7ci_A_A1A2
+---
+> #PBS -N s7ci_B_B5bB14
+== final magnetisation of ordinary images (tot)
+01 4.0049554
+02 4.0025066
+03 4.0081957
+04 4.0173678
+05 4.0259162
+06 4.0968549
+dist.pl 00-07 5.682
+spacing 1.443 1.457 1.456 1.464 1.459 1.450 1.451
+allocation not visible
+submitted 1595539.stdct-mgmt-02
