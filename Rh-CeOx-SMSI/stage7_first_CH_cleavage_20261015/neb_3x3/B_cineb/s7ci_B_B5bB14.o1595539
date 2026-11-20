@@ -1,0 +1,11 @@
+Unloading shared
+  WARNING: Did not unuse /cm/shared/modulefiles
+Loading intel/2021b
+  Loading requirement: GCCcore/11.2.0 zlib/1.2.11-GCCcore-11.2.0
+    binutils/2.37-GCCcore-11.2.0 intel-compilers/2021.4.0
+    numactl/2.0.14-GCCcore-11.2.0 UCX/1.11.2-GCCcore-11.2.0
+    impi/2021.4.0-intel-compilers-2021.4.0 imkl/2021.4.0 iimpi/2021b
+    imkl-FFTW/2021.4.0-iimpi-2021b
+job_id=1595539.stdct-mgmt-02 host=CN-104 ranks=72 workdir=/scratch/junbotong/Dynamic_SMSI_stage7_first_CH_cleavage_20261015/neb_3x3/B_cineb start=2026-11-20T09:37:41+08:00
+end=2026-11-20T09:53:31+08:00 rc=0
+NEB converged

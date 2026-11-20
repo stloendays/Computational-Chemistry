@@ -4,7 +4,7 @@ CH₄* → CH₃* + H*/OH* only. Kinetics: ordinary NEB (`LCLIMB = .FALSE.`) fir
 paths that pass the review. Plan: `../weekly_plans/2026-10-15_first_CH4_cleavage_four_models_and_850C_atmospheres.md`;
 next steps: `PLAN_after_D_parent_20261025.md`. Status as of 2026-10-27.
 
-**Latest, 2026-11-20: [`NEB_status_20261120.md`](NEB_status_20261120.md)** — B ordinary NEB converged (1.356 eV, 4 Ce³⁺ on every image) and its CI-NEB submitted; the C +3 eV profile traced to images that lost both Ce³⁺ (image 01, an intact CH₄, +1.69 eV), next resume seeds the images from the endpoint WAVECARs; resumes now run server-side ([`monitor/server/README.md`](monitor/server/README.md)).
+**Latest, 2026-11-20: [`NEB_status_20261120.md`](NEB_status_20261120.md)** — B CI-NEB converged (climbing image +1.355 eV, 4 Ce³⁺ on every image); the C +3 eV profile traced to images that lost both Ce³⁺ (image 01, an intact CH₄, +1.69 eV), next resume seeds the images from the endpoint WAVECARs; resumes now run server-side ([`monitor/server/README.md`](monitor/server/README.md)).
 
 **2026-11-18: [`NEB_status_20261118.md`](NEB_status_20261118.md)** — A CI-NEB barrier 0.714 eV with the saddle frequency; B final state rebuilt as B14 (CH₃O* + OH*), ordinary NEB ≈ 1.36 eV and nearly converged; C NEB slowed by restarts that did not read WAVECAR (fixed); CH₃ does not bind on model D.
 
