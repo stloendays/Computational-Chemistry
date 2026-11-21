@@ -9,7 +9,7 @@
 1. 用 auto_free 队列，1 核、4 GB、walltime 2 h，作业名 `s7mon`，不计机时。
 2. 运行时先 ssh 到 `stdct-login-01`，失败就换 `stdct-login-02`，在登录节点上跑 `monitor/monitor_stage7.py`。这个脚本和本地任务调用的是同一个，所以续算、重投、记录的规则完全相同。两个登录节点都连不上时才在计算节点上直接跑，这时查不了配额。
 3. 跑完把结果记一行到 `server_monitor.log`，完整报告存为 `last_run.txt`。
-4. 用 `qsub -a <当前时间+INTERVAL_H>` 把下一次排上；PBS 在那个时间之前不会启动它，排队时显示状态 W。
+4. 用 `qsub -a` 保持两个等待中的作业（+INTERVAL_H 和 +2×INTERVAL_H），并删掉被 PBS 挂起的 s7mon（11-21 起）；PBS 在指定时间之前不会启动它们，排队时显示状态 W。
 5. 以下三种情况不再续投：
    - 存在 `STOP` 文件；
    - 监控报告全部完成（`DONE=1`）；
@@ -36,6 +36,7 @@
 | 计算节点可以 qsub，也能免密 ssh 回登录节点 | 探针 1595591 的子作业 1595610 跑完（`child.out`）；1595612 里 `ssh stdct-login-01` 后 `hpc project` 正常 | 续投和续算都在服务器内部完成 |
 | 计算节点上有 python3 | 3.9.18，`/bin/python3` | 不需要加载 module |
 | 提交脚本报"额度读不到"，其实额度正常 | 11-20 两次提交前都报错，单独跑 `hpc project` 都能读到 | 原因是脚本开了 `set -o pipefail`，又用 `hpc project \| grep -q`：grep 一匹配到就退出，`hpc` 收到 SIGPIPE，整条管道被判失败。改为先把输出存进变量，再用 grep 判断。监控脚本用 Python 正则读输出，不受影响 |
+| 链条中的单个作业被 PBS 挂起（"too many failed attempts to run"，Exit −3，run_count 21），整条链就断了：11-20 19:25 之后约 24 h 没有运行 | s7mon 1598628（11-21）；11-11 A 的 CI-NEB 1539627 也遇到过同样的节点侧启动失败 | 每次运行先 qdel 被挂起的 s7mon，并始终保持两个等待中的作业（+间隔、+2×间隔），单个作业被挂起只耽误一个间隔 |
 | 本地 Windows 上写出的 .pbs 可能带 CRLF | — | 上传后执行 `sed -i 's/\r$//'`，再用 `bash -n` 检查语法 |
 
 ## 同时加入的续算功能：端点 WAVECAR 播种

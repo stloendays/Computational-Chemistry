@@ -43,16 +43,25 @@ echo "$(now) job=${PBS_JOBID:-manual} rc=$RC attention=${ATT:-?} done=${DONE:-?}
 # queue the next run unless stopped / finished / already queued
 if [ -e "$H/STOP" ]; then echo "$(now) STOP present: chain ended" >> "$LOG"; exit 0; fi
 if [ "${DONE:-0}" = "1" ]; then echo "$(now) monitor reports DONE: chain ended" >> "$LOG"; exit 0; fi
+# 11-21: link 1598628 (due 11-21 00:25) was held by PBS ("too many failed attempts to run", Exit -3, run_count 21 -
+# a node-side start failure, as CI-NEB A 1539627 on 11-11) and the single-successor chain stopped. Now every run
+# (1) qdel's held s7mon links and (2) keeps two waiting links, at +IV and +2*IV, so one held link costs one interval.
 MINE=${PBS_JOBID%%.*}
-if qselect -u "$USER" -N s7mon -s QWHT 2>/dev/null | grep -v "^$MINE\." | grep -q .; then
-  echo "$(now) another s7mon job already queued: not resubmitting" >> "$LOG"; exit 0
-fi
-IV=$(cat "$H/INTERVAL_H" 2>/dev/null || echo 5); IV=${IV%%.*}; [ "${IV:-0}" -ge 1 ] 2>/dev/null || IV=5
-AT=$(date -d "+${IV} hours" +%Y%m%d%H%M)
-bash "$HOME/hpc_login.sh" > /dev/null 2>&1
-for try in 1 2 3; do
-  J=$(qsub -a "$AT" "$H/server_monitor.pbs" 2>&1) && { echo "$(now) next run $J at $AT" >> "$LOG"; exit 0; }
-  sleep 120
+for J in $(qselect -u "$USER" -N s7mon -s H 2>/dev/null | grep -v "^$MINE\."); do
+  qdel "$J" 2>/dev/null && echo "$(now) held link $J deleted" >> "$LOG"
 done
-echo "$(now) RESUBMIT FAILED: $J" >> "$LOG"
-exit 1
+NW=$(qselect -u "$USER" -N s7mon -s QW 2>/dev/null | grep -v "^$MINE\." | grep -c .)
+IV=$(cat "$H/INTERVAL_H" 2>/dev/null || echo 5); IV=${IV%%.*}; [ "${IV:-0}" -ge 1 ] 2>/dev/null || IV=5
+case "$NW" in 0) OFFS="$IV $((2 * IV))" ;; 1) OFFS="$((2 * IV))" ;; *) OFFS="" ;; esac
+[ -n "$OFFS" ] || { echo "$(now) $NW links already waiting: not resubmitting" >> "$LOG"; exit 0; }
+bash "$HOME/hpc_login.sh" > /dev/null 2>&1
+RCALL=0
+for OFF in $OFFS; do
+  AT=$(date -d "+${OFF} hours" +%Y%m%d%H%M); ok=0
+  for try in 1 2 3; do
+    J=$(qsub -a "$AT" "$H/server_monitor.pbs" 2>&1) && { echo "$(now) next run $J at $AT" >> "$LOG"; ok=1; break; }
+    sleep 120
+  done
+  [ $ok = 1 ] || { echo "$(now) RESUBMIT FAILED for +${OFF} h: $J" >> "$LOG"; RCALL=1; }
+done
+exit $RCALL
